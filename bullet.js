@@ -23,7 +23,7 @@ class Bullet{
       this.type="range";
     }
     this.emit = "Shape";
-    let squares = ["common","spike","range"];
+    let squares = ["common","spike","range","phase"];
     let magics = ["magic"];
     if(squares.includes(this.type)){
        this.emit = "Square";
@@ -35,6 +35,10 @@ class Bullet{
     if (this.type =="bomb"){
       this.size = 90;
     }
+    this.canMove = true;
+    this.isMain = true;
+    this.shotId = 0;
+    this.canBlow = true;
   }
   assignHoming(){
     this.homingTarget = null;
@@ -68,14 +72,19 @@ class Bullet{
   }
   kill(){
     
-    if(this.type=="bomb"&&this.alive){
+    if(this.type=="bomb"&&this.alive&&this.canBlow){
+      this.canBlow=false;
+      this.alive=false;
   let shotId = generateCode();
                 let dmgId = generateCode();
   for(let i=0; i<8; i++){
     let bulletData = {x:this.x,y: this.y,xvel: cos(i*360/8)*20,yvel: sin(i*360/8)*20,type:  "range",id:this.playerId,coloring: this.coloring,bId: generateCode(),gained: 0,damageId: dmgId,shotId: shotId};
      bullets[bullets.length]=new Bullet(bulletData.x,bulletData.y,bulletData.xvel,bulletData.yvel,bulletData.type,this.playerId,this.coloring,bulletData.dmgId);
+    bullets[bullets.length-1].isMain = false;
     //recoil
+    if(this.playerId==myId){
     socket.emit("updateBullet", bulletData);
+    }
     }
   }
     this.alive=false;
@@ -95,12 +104,7 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
     x = player.x;
     y = player.y;
     coloring = player.coloring
-  }else if(players[id]?.health-1<=0){
-           if(player.maxHealth-player.health>0){
-     hitParticleQueue[hitParticleQueue.length] = {id: myId, damage: `+${player.maxHealth-player.health}`, coloring: "rgb(150,255,200)"};
   }
-    player.health=player.maxHealth;
-    }
  // print(this.coloring,players[this.playerId]?.coloring,player.coloring)
   if(!damagedBulletIds.includes(this.damageId)&&((this.playerId==myId) ? (this.coloring!=players[id]?.coloring) : (this.coloring!=player.coloring))){
   hitParticleQueue[hitParticleQueue.length] = {id: id, damage: 0-damage, coloring: 255};
@@ -128,6 +132,8 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
 }
   work(){
     this.angleTick++;
+    
+    if(this.canMove){
     if(this.type=="spike"){
     this.x+=this.xvel/0.9;
     this.y+=this.yvel/0.9;
@@ -138,13 +144,17 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
       this.x+=this.xvel;
     this.y+=this.yvel;
     }
-    if(this.playerId==myId){
+    }else{
+      this.alive = true;
+      this.life = 120;
+    }
+    if(this.playerId==myId&&this.canMove){
     for(let i of Object.keys(players)){
     if(i!=myId){
       let item = players[i];
       if(item?.x!=undefined&&item?.y!=undefined){
         if(dist(this.x,this.y,item.x,item.y)<=this.size/2+50){
-        this.damage(item?.id, this.type=="snipe"?2:1, item?.coloring, item.x,item.y);
+          this.damage(item?.id, this.type=="snipe"?2:1, item?.coloring, item.x,item.y);
         }
       }
          
@@ -160,6 +170,7 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
           particles[particles.length] = new Particle(this.x,this.y,cos(angle)*power,sin(angle)*power,this.emit,myId,this.coloring)
         }
       }
+if(this.canMove){
     if(frameCounts%4==0){
     particles[particles.length] = new Particle(this.x,this.y,random(-5,5),random(-5,5),this.emit,myId,this.coloring);
   }
@@ -167,6 +178,36 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
       let distance = dist(block.x,block.y,this.x,this.y);
       if(distance<=this.size/2+block.radius){
         if(this.type!="bounce"||this.bounces<=0){
+          if (this.type == "phase"&&this.alive){
+            this.alive= false;
+            let c = createVector(this.x-block.x,this.y-block.y);
+            c.normalize();
+            c.mult(block.radius);
+            let a1 = atan2(c.y,c.x);
+            let a2 = atan2(this.yvel,this.xvel);
+            let a3 = a2-a1;
+            let a4 = 180-a3-a3;
+            let len = sqrt(((block.radius**2)*2)-(2*block.radius*block.radius*cos(a4)));
+            let v = createVector(this.xvel,this.yvel);
+            v.normalize();
+            v.mult(len+30);
+            let shotId = generateCode();
+                let dmgId = generateCode();
+            
+  for(let i=0; i<3; i++){
+    let angle = a2+(30*(i-1));
+    let d = dist(0,0,this.xvel,this.yvel);
+    let s1 = cos(angle)*d;
+    let s2 = sin(angle)*d;
+    let bulletData = {x:block.x+c.x+v.x,y: block.y+c.y+v.y,xvel: s1,yvel: s2,type:  "range",id:this.playerId,coloring: this.coloring,bId: generateCode(),gained: 0,damageId: dmgId,shotId: shotId};
+     bullets[bullets.length]=new Bullet(bulletData.x,bulletData.y,bulletData.xvel,bulletData.yvel,bulletData.type,this.playerId,this.coloring,bulletData.dmgId);
+    bullets[bullets.length-1].isMain = false;
+    //recoil
+    if(this.playerId==myId){
+    socket.emit("updateBullet", bulletData);
+    }
+    }
+          }
       this.kill();
         let base = atan2(this.y-block.y,this.x-block.x)
         for(let i=0; i<13; i++){
@@ -194,6 +235,33 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
         }
       }
      }
+  for(let block of changeObjects){
+      let distance = dist(block.x,block.y,this.x,this.y);
+      if(distance<=this.size/2+block.radius){
+       // print(this.playerId==myId,this.isMain,block.shotsTaken,this.shotId)
+        if(this.playerId==myId&&this.isMain&&!block.shotsTaken.includes(this.shotId)){
+          block.sizeVel-=10;
+            if(dist(player.x,player.y,width/2,height/2)<=50+safeRadius){
+        block.gunStage++;
+          block.shotsTaken+=this.shotId;
+            }
+           }
+         this.kill();
+         let base = atan2(this.y-block.y,this.x-block.x)
+        for(let i=0; i<13; i++){
+          let power = random(10,20);
+          let angle = random(base-120,base+120);
+          particles[particles.length] = new Particle(this.x,this.y,cos(angle)*power,sin(angle)*power,this.emit,myId,this.coloring)
+        }
+        base = atan2(this.yvel,this.xvel);
+        for(let i=0; i<5; i++){
+          let power = random(10,20);
+          let angle = random(base-15,base+15);
+          particles[particles.length] = new Particle(this.x,this.y,cos(angle)*power,sin(angle)*power,this.emit,myId,this.coloring)
+        }
+      }
+  }
+}
     if(this.type=="common"){
       this.life-=0.5;
       pg.push();
@@ -208,6 +276,21 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
       pg.beginShape();
       for(let i=0; i<7; i++){
         pg.vertex(cos(360/7*i)*20,sin(360/7*i)*20);
+      }
+      pg.endShape(CLOSE);
+      pg.pop();
+    }
+if(this.type=="phase"){
+      this.life-=0.5;
+      pg.push();
+      pg.translate(this.x,this.y);
+      pg.strokeWeight(10);
+      pg.noFill();
+      pg.fill(20);
+      pg.stroke(this.coloring);
+      pg.beginShape();
+      for(let i=0; i<4; i++){
+        pg.vertex(cos(360/4*i)*20,sin(360/4*i)*20);
       }
       pg.endShape(CLOSE);
       pg.pop();

@@ -1,4 +1,5 @@
-var gunData = {"common": {zoom: 0.6, reload: 1.55,recoil: 0.5,display: "Common"},"spike": {zoom: 0.8, reload: 1.9,recoil: 4, display: "Spike"},"range": {zoom: 0.75, reload: 1.5,recoil: 2, display: "Ranger"},"homing": {zoom: 0.5, reload: 1.6,recoil: 2,display: "Navigation"},"bounce": {zoom: 0.7, reload: 1.2,recoil: 2,display: "Bounce"},"magic": {zoom: 0.6, reload: 1.2, recoil: 0, display: "Magic"},"shock": {zoom: 0.5, reload: 1.1, recoil: 3,display:"Shockwave"},"dash": {zoom: 0.7, reload: 1.5, recoil: -4.5,display:"Dash"},"nuclex": {zoom: 0.53, reload: 1.35, recoil: 1,display:"Nuclex"}, "recall": {zoom: 0.6, reload: 1.5, recoil: 0.5,display:"Reverb"}, "bomb": {zoom: 0.6,reload: 1.7,recoil: 2,display:"Bomb"}, "snipe": {zoom: 0.4, reload:1.1,recoil:3,display:"Sniper"}};
+var gunData = {"common": {zoom: 0.6, reload: 1.55,recoil: 0.5,display: "Common",regen: 2.5,details:"Shoots a single bullet!"},"spike": {zoom: 0.7, reload: 1.9,recoil: 4, display: "Spike",regen: 2.5,details:"Shoots four short spikes!"},"homing": {zoom: 0.5, reload: 1.6,recoil: 2,display: "Navigation",regen: 3,details:"Bullets avoid nearby walls!"},"bounce": {zoom: 0.7, reload: 1.2,recoil: 2,display: "Bounce",regen: 2.5,details:"Bullets bounce off walls!"},"magic": {zoom: 0.6, reload: 1.2, recoil: 0, display: "Magic",regen: 3.5,details:"Bullets moves towards nearby enemies!"},"shock": {zoom: 0.5, reload: 1.1, recoil: 3,display:"Shockwave",regen: 3,details:"Shoots a barrage of bullets!"},"dash": {zoom: 0.7, reload: 1.5, recoil: -4.5,display:"Dash",regen: 2,details:"Boosts the player forwards!"},"nuclex": {zoom: 0.53, reload: 1.35, recoil: 1,display:"Nuclex",regen: 3,details:"Bullets oscillate back and forth!"}, "recall": {zoom: 0.6, reload: 2, recoil: 0.5,display:"Reverb",regen: 1.9,details:"Bullets slowly start backtracking!"}, "bomb": {zoom: 0.6,reload: 1.7,recoil: 2,display:"Bomb",regen: 3.5,details:"Explodes with bullets on hit!"}, "snipe": {zoom: 0.4,reload:1.1,recoil:3,display:"Sniper",regen: 4,details:"Fast bullets deal double damage!"}, "phase":{zoom: 0.6,reload: 1.65,recoil: 1.6,display:"Phase",regen: 2.7,details:"Triples bullets through walls!"}};
+//"range": {zoom: 0.75, reload: 1.5,recoil: 2, display: "Ranger",regen: 1.5},
 let guns = Object.keys(gunData);
 var colors = ['rgb(141,236,243)','rgb(246,161,161)','rgb(241,221,135)','rgb(155,243,168)','rgb(141,176,244)','rgb(237,161,248)'];
 var faces = ["scared","happy","evil","dead"];
@@ -9,17 +10,20 @@ var emptySound;
 var player;
 var particles = [];
 var hitParticleQueue = [];
-var version = "v2.8.2";
+var version = "v3.3.2";
 var playingTime = 0;
+var helpMsgs = {"How to Play": `WASD or Arrow Keys To Move\nClick or Space to Shoot\nShoot Nodes To Change Stats\nEnter/Return to Open Chat\nTeams Are Sorted by Color\nHealth is Around Player\nAmmo is Around Cursor`,"Weapon Details": "Weapon","Developer Notes": `This Game is still in Development!\nMade By: HF_ang & Emey\nCreated With p5.js and socket.io\nReport Bugs to hfanggamedev\nVersion: ${version}\nHave Fun!!!`};
+//"Combat Tips": `Use the Arrow to Track Positions\nPredict Where Enemies are Moving\nUse Walls To Your Advantage\nUse Recoil For Movement\nSave Ammo, Drain Theirs\nMove In All Directions\nShoot Multiple Shots At Once`,
+var helpMsg = helpMsgs["How to Play"];
 /*
 Version:
   Prototyping Shooting and Socket
   Main UI merged version
   PVP Weapon Changing
 -
-  Fixed/Reworked World Gen, New Bullets, New Commands, PVP System, Chat Update, Dash & Shock, Nuclex, Recall
+  New Gun Phase, Added Dummy ChangeObject, Added Spawn Details
 -
-  Recall Patch, Healing Patch
+  Spawn Details Clip, Added New Spawn Details
 */
 var ipData;
 var myIP;
@@ -50,8 +54,11 @@ function setup(){
   loadSocket();
   emptySound.loop();
   emptySound.setVolume(0);
-  setInterval(CustomDraw, 1000/60)
-  changeObjects[changeObjects.length] = new WorldObject(width/2,height/2-safeRadius+100,100,"Gun","static");
+  setInterval(CustomDraw, 1000/60);
+  changeObjects[changeObjects.length] = new WorldObject(width/2,height/2-safeRadius+130,80,"Gun","static");
+   changeObjects[changeObjects.length] = new WorldObject(width/2,height/2+safeRadius-130,80,"Player","static");
+  changeObjects[changeObjects.length] = new WorldObject(width/2-safeRadius+130,height/2,80,"Color","static");
+  changeObjects[changeObjects.length] = new WorldObject(width/2+safeRadius-130,height/2,80,"Face","static");
 }
 var changeObjects = [];
 var mouse={x:0,y:0};
@@ -120,8 +127,13 @@ function CustomDraw(){
   for(let i=0; i<30; i++){
     pg.arc(width/2,height/2,radius*2,radius*2,i*360/30,(i+0.4)*360/30);
   }
+    if(dist(player.x,player.y,width/2,height/2)<=50+radius){
+           if(player.maxHealth-player.health>0){
+     hitParticleQueue[hitParticleQueue.length] = {id: myId, damage: `+${player.maxHealth-player.health}`, coloring: "rgb(150,255,200)"};
+  }
+    player.health=player.maxHealth;
+    }
     pg.pop();
-    
   for(let i=particles.length-1; i>=0; i--){
     if(particles[i].layer==0){
     particles[i].work();
@@ -135,6 +147,10 @@ function CustomDraw(){
     if(!bullets[i].alive){
       bullets.splice(i,1);
     }
+  }
+    //changeObjects[changeObjects.length]
+    for(let i = changeObjects.length-1; i>=0; i--){
+    changeObjects[i].work();
   }
   //BLOCKS
   for(let i = blocks.length-1; i>=0; i--){
@@ -219,6 +235,21 @@ for(let i of Object.keys(players)){
     }
     }
   }
+      pg.push();
+pg.beginClip({ invert: true });
+pg.fill(255);
+pg.ellipse(player.x,player.y,180+sin(frameCounts*2)*5,180+sin(frameCounts*2)*5);
+pg.rect(player.x,player.y-110,user.length*30+sin(frameCounts*2)*5+5,100+sin(frameCounts*2)*5,100);
+pg.endClip();
+        pg.translate(width/2,height/2);
+        pg.strokeWeight(2);
+        pg.textSize(50);
+let tintV = min((1- dist(player.x,player.y,width/2,height/2) /(200+safeRadius)) *600,255);
+        pg.fill(255,tintV)
+                pg.stroke(255,tintV)
+        pg.textAlign(CENTER,CENTER);
+        pg.text(helpMsg,0,0);
+        pg.pop();
    mouseSprite(mouse.x,mouse.y,player.coloring,mouseProg,player.ammo,player.gunType);
   for(let i of Object.keys(cursors)){
     if(i!=myId){
@@ -601,6 +632,9 @@ window.addEventListener("paste", (e) => {
 });
 function attemptShoot(){
     if(player.ammo>0&&screen>0&&player.healthImpact<=0.001){
+       if(dist(player.x,player.y,width/2,height/2)>50+safeRadius){
+       player.ammo-=1;
+       }
        let dmgId = generateCode();
       let shotId = generateCode();
     let angle = atan2(mouse.y-player.y,mouse.x-player.x);
@@ -621,9 +655,6 @@ function attemptShoot(){
     }else if(player.gunType=="nuclex"){
       amount = 2;
     }
-      if(allIds.length>1){
-        player.ammo-=1;
-    }
     for(let i=0; i<amount; i++){
       let sizer = 0
       let randomAngle = random(-offset,offset);
@@ -633,6 +664,9 @@ function attemptShoot(){
        if(player.gunType=="range"){
          randomAngle=(i-1)*random(25,30);
        }
+      // if(player.gunType=="phase"){
+      //    randomAngle=(i-1)*random(25,30);
+      //  }
       if(player.gunType=="nuclex"){
          randomAngle=0;
        }
@@ -666,7 +700,7 @@ function attemptShoot(){
       }else if(player.gunType=="bounce"){
          bulletV.mult(22);
       }else if(player.gunType=="common"){
-         bulletV.mult(39);
+         bulletV.mult(30);
       }else if(player.gunType=="magic"){
          bulletV.mult(20);
       }else if(player.gunType=="shock"){
@@ -677,6 +711,8 @@ function attemptShoot(){
          bulletV.mult(20);
       }else if(player.gunType=="snipe"){
          bulletV.mult(43);
+      }else if(player.gunType=="phase"){
+        bulletV.mult(30)
       }else{
         bulletV.mult(30);
       }
@@ -701,6 +737,7 @@ function attemptShoot(){
         dmgId = generateCode();
       }
   bullets[bullets.length]=new Bullet(player.x,player.y,bulletV.x,bulletV.y,emittedBullet,myId,player.coloring,dmgId);
+      bullets[bullets.length-1].shotId = shotId;
   let bulletData = {x: player.x,y: player.y,xvel: bulletV.x,yvel: bulletV.y,type:  emittedBullet,id: myId,coloring: player.coloring,bId: bullets[bullets.length-1].id,gained: 1,damageId: dmgId,shotId: shotId};
     //recoil
     socket.emit("updateBullet", bulletData);
@@ -715,9 +752,13 @@ function attemptShoot(){
      shake = 15
   }
   if(screen>0&&player.healthImpact<=0.001){
-    player.healthImpact+=15;
+  if(dist(player.x,player.y,width/2,height/2)<=50+safeRadius){
+    player.healthImpact+=0.5;
+  }else{
+     player.healthImpact+=15;
   }
   }
+}
 function mouseReleased(){
   mouseProg.tweenVel+=5;
   mouseProg.dir*=1.3;
@@ -820,6 +861,7 @@ function mouseSprite(x,y,color,mouseProgs,ammo,type){
   }
   pg.rotate(mouseProgs.prog*2);
   let sides = ammo;
+  
   for(let i=0; i<sides; i++){
     pg.rotate(360/sides);
     if(type=="common"){
@@ -868,7 +910,7 @@ function mouseSprite(x,y,color,mouseProgs,ammo,type){
     }
     else if(type=="shock"){
       pg.noFill();
-      pg.arc(0,0,60+mouseProgs.tween,60+mouseProgs.tween,(-180/(ammo*2.5)),(180/(ammo*2.5)))
+      pg.arc(0,0,80+mouseProgs.tween,80+mouseProgs.tween,(-180/(ammo*2.5)),(180/(ammo*2.5)))
      // pg.arc(0,0,60+mouseProgs.tween,60+mouseProgs.tween,-360/(ammo+30),360/(ammo+30));
     }else if(type=="dash"){
       pg.noFill();
@@ -882,6 +924,11 @@ function mouseSprite(x,y,color,mouseProgs,ammo,type){
       pg.line(5,40+mouseProgs.tween/2,0,30+mouseProgs.tween/2);
       pg.line(-5,40+mouseProgs.tween/2,0,30+mouseProgs.tween/2);
       pg.line(0,40+mouseProgs.tween/2,0,20+mouseProgs.tween/2);
+    }else if(type=="phase"){
+      pg.noFill()
+      pg.line(0-mouseProgs.tween/3,35+mouseProgs.tween/2,-6+mouseProgs.tween/3,45+mouseProgs.tween/2);
+      pg.line(0-mouseProgs.tween/3,35+mouseProgs.tween/2,6+mouseProgs.tween/3,45+mouseProgs.tween/2);
+      pg.line(0,30+mouseProgs.tween/2,0,40+mouseProgs.tween/2);
     }else if(type=="recall"){
       pg.noFill();
       // pg.translate(0,10+sin(frameCounts-(360/i)*180/PI)*20)

@@ -163,7 +163,7 @@ if(!players[data.id]){
     allIds.sort();
     if(allIds.indexOf(myId)!=-1&&data.id == allIds[(allIds.indexOf(myId)+1)%allIds.length]){
       if(!addedBullets.includes(data.bulletData.shotId)){
-       player.ammo+=data.bulletData.gained;
+      // player.ammo+=data.bulletData.gained;
         addedBullets[addedBullets.length] = data.bulletData.shotId;
       }
     }

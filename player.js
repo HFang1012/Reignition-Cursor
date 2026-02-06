@@ -12,7 +12,7 @@ class Player{
     this.maxHealth = 7;
     this.id = myId;
     this.gunType = guns[floor(random(0,guns.length))];
-   // this.gunType="snipe"
+   this.gunType="phase"
    // this.gunType="homin
     this.direction = {x: 0, y: 0};
     this.directionTween = {x:0,y:0};
@@ -30,8 +30,18 @@ class Player{
     this.healthImpact=0;
     this.healthAngle = 0;
     this.ip = "NONE";
+    this.canShoot=false;
+    this.falsePlayer = false;
+    this.count = 0;
   }
   work() {
+    if(frameCounts%(60*(gunData[this.gunType].regen-0.5))==0&&this.ammo<6){
+       this.ammo+=1;
+      mouseProg.tweenVel-=10;
+  mouseProg.dir*=2;
+  mouseProg.dir=constrain(mouseProg.dir,-11,11);
+    }
+    this.ammo = min(6,this.ammo);
     this.ip = myIP;
     if(this.health<=0){
       this.x=this.spawnPos.x
@@ -39,6 +49,20 @@ class Player{
       this.health = 7;
     }
     this.healthImpact/=gunData[this.gunType].reload ?? 1.4;
+    if(this.healthImpact<=0.001){
+      if(this.canShoot==false){
+        mouseProg.tweenVel-=10;
+  mouseProg.dir*=-4;
+  mouseProg.dir=constrain(mouseProg.dir,-11,11);
+        this.canShoot=true;
+        for(let i=0; i<5; i++){
+          let angle = random(0,360);
+          particles[particles.length] = new Particle(this.x,this.y,cos(angle)*30,sin(angle)*30,"Shape",myId,player.coloring)
+        }
+      }
+    }else{
+      this.canShoot= false;
+    }
     let keyInputs = {w: keyIsDown(ischar("w"))||keyIsDown(ischar("up")), a: keyIsDown(ischar("a"))||keyIsDown(ischar("left")), s: keyIsDown(ischar("s"))||keyIsDown(ischar("down")), d: keyIsDown(ischar("d"))||keyIsDown(ischar("right"))};
     let direction = createVector((keyInputs.d-keyInputs.a),(keyInputs.s-keyInputs.w));
     this.direction = {...direction};
@@ -162,7 +186,7 @@ class Player{
       pg.rotate(-angleChange);
     }
     pg.pop();
-    
+    if(!this.falsePlayer){
     //weapon?
     pg.push();
     pg.translate(this.x,this.y);
@@ -175,7 +199,7 @@ class Player{
     if(devIPs.includes(this.ip)){
       pg.fill("#70A7FF");
       pg.stroke("#70A7FF");
-      //pg.text(`(SOMEONE'S PLAYING GAMES IN SCHOOL?!?!?)`,0,130);
+      //pg.text(`(Dev)`,0,130);
     }
     pg.textSize(35);
     pg.fill(255);
@@ -195,6 +219,7 @@ class Player{
     }
     pg.line(0,-100,0,-140);
     pg.pop();
+    }
   }
 }
 
