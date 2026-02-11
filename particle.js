@@ -25,6 +25,9 @@ class Particle{
     }
   }
   work(){
+    if(particles.length>150){
+this.alive-=5.5;
+    }
     this.alive-=3.5;
     this.x+=this.xvel;
     this.y+=this.yvel;

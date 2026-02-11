@@ -178,7 +178,7 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
         }
       }
 if(this.canMove){
-    if(frameCounts%4==0){
+    if(frameCounts%5==0){
     particles[particles.length] = new Particle(this.x,this.y,random(-5,5),random(-5,5),this.emit,myId,this.coloring);
   }
      for(let block of blocks){

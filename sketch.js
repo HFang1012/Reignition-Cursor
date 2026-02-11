@@ -78,8 +78,8 @@ function CustomDraw(){
   if(screen>0){
     playingTime++;
   }
-  if(keyIsDown(86)&&!typing&&screen>0&&Object.keys(players).length<=0){
-    zoom+=((0.2)-zoom)/5
+  if(keyIsDown(86)&&!typing&&screen>0){
+    zoom+=((0.1)-zoom)/5
   }else{
   zoom+=((gunData[player.gunType].zoom ?? 1)-zoom)/10
    }
@@ -330,13 +330,13 @@ if(showDetails){
       
   pg.push();
   pg.resetMatrix();
-pg.fill(255,350-max(chatTransTween,0));
+pg.fill(255,350-min(chatTransTween,100));
 pg.textSize(50);
 pg.noStroke();
 pg.strokeWeight(1);
-pg.stroke(255,350-max(chatTransTween,0));
+pg.stroke(255,350-min(chatTransTween,150));
 fpsTrack[fpsTrack.length]=frameRate()/60*100
- pg.text(`FPS: ${floor(fpsTrack[(fpsTrack.length-1)-(fpsTrack.length-1)%5]*60)/100}\nLast Server Update: ${framesSince}\nLobby Code: ${room}\nDetected Players: ${Object.keys(players).length+1}\nGame Version: ${version}`,20,50);
+ pg.text(`FPS: ${floor(fpsTrack[(fpsTrack.length-1)-(fpsTrack.length-1)%5]*60)/100}\nLast Server Update: ${framesSince}\nLobby Code: ${room}\nDetected Players: ${Object.keys(players).length+1}\nParticles: ${particles.length}, Blocks: ${blocks.length}, Bullets: ${bullets.length}`,20,50);
 let iter = 0;
 pg.strokeWeight(4);
 pg.line(355-80,20,355-80,50)
@@ -855,7 +855,7 @@ function mousePressed(){
     }
   }
   //royale
-  if (rectHit(brx,500,mouse.x,mouse.y,150,70,5,5)&&screen==0){
+  if (rectHit(brx,500,mouse.x,mouse.y,200,70,5,5)&&screen==0){
     if (usernameText){
     let code = generateCode();
       print(room)
