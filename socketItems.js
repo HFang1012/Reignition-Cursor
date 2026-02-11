@@ -91,7 +91,7 @@ socket.on("rooms_list", (rooms) => {
 socket.on("newPlayer", (data) => {
   if(!allIds.includes(data.id)) allIds[allIds.length] = data.id;
   if(data.id!=socket.id){
- 
+ /*
    cursors[data.id] = {x: data.x, y: data.y,mouseProg: {prog: 0,dir: 1,tween: 0, tweenVel: 0,
     ammo: player.ammo,
     gunType: player.gunType,
@@ -107,6 +107,7 @@ socket.on("newPlayer", (data) => {
       username: "d",
       chatText: ""
   };
+  */
   
 }
   
@@ -125,10 +126,16 @@ socket.on("removePlayer", (id) => {
   delete cursors[id];
   delete players[id];
 });
-
+//availableRooms
+  socket.on("gotRooms", (data) => {
+  if(data.id!=myId){
+  availableRooms=data.roomData;
+}
+})
 // Position updates from other players in room
 socket.on("update", (data) => {
    if(!allIds.includes(data.id)) allIds[allIds.length] = data.id;
+  //print(data.id,myId)
   if(data.id!=myId){
   framesSince=0;
  // print(data.cursorData.gunType)
@@ -235,7 +242,7 @@ function sendUpdate() {
     gunType: player.gunType,
     coloring: player.coloring,
   };
-  cursors[myId] = myData;
+  //cursors[myId] = myData;
   socket.emit("updateCursor", myData); // client NEVER uses .to()
   
 }

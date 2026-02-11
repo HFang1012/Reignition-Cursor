@@ -35,6 +35,9 @@ class Bullet{
     if (this.type =="bomb"){
       this.size = 90;
     }
+    if (this.type =="jumper"){
+      this.size = 50;
+    }
     this.canMove = true;
     this.isMain = true;
     this.shotId = 0;
@@ -112,11 +115,13 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
     hitParticleQueue[hitParticleQueue.length] = {id: id, damage: 0, coloring: 255};
   }
   shake+=10;
+  // if (this.type!="jumper"){
   for(let i=0; i<10; i++){
           let power = random(-5,-2);
           let angle = random(0,360);
           particles[particles.length] = new Particle(x-cos(angle)*85,y-sin(angle)*85,cos(angle)*power,sin(angle)*power,"Shape",myId,coloring)
   }
+  // }
 }else{
  // hitParticleQueue[hitParticleQueue.length] = {id: id, damage: 0, coloring: 255};
   damagedBulletIds[damagedBulletIds.length] = this.damageId;
@@ -124,11 +129,13 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
    shake+=25;
 }
    damagedBulletIds[damagedBulletIds.length] = this.damageId;
+// if (this.type!="jumper"){
     for(let i=0; i<7; i++){
           let power = random(0,30);
           let angle = random(0,360);
           particles[particles.length] = new Particle(this.x,this.y,cos(angle)*power,sin(angle)*power,this.emit,myId,this.coloring)
   }
+// }
 }
   work(){
     this.angleTick++;
@@ -154,7 +161,7 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
       let item = players[i];
       if(item?.x!=undefined&&item?.y!=undefined){
         if(dist(this.x,this.y,item.x,item.y)<=this.size/2+50){
-          this.damage(item?.id, this.type=="snipe"?2:1, item?.coloring, item.x,item.y);
+          this.damage(item?.id, (this.type=="snipe"||this.type=="jumper")?2:1, item?.coloring, item.x,item.y);
         }
       }
          
@@ -177,7 +184,7 @@ if(this.canMove){
      for(let block of blocks){
       let distance = dist(block.x,block.y,this.x,this.y);
       if(distance<=this.size/2+block.radius){
-        if(this.type!="bounce"||this.bounces<=0){
+        if(this.type!="bounce"&&this.type!="jumper"||this.bounces<=0&&this.type!="jumper"){
           if (this.type == "phase"&&this.alive){
             this.alive= false;
             let c = createVector(this.x-block.x,this.y-block.y);
@@ -221,7 +228,7 @@ if(this.canMove){
           let angle = random(base-15,base+15);
           particles[particles.length] = new Particle(this.x,this.y,cos(angle)*power,sin(angle)*power,this.emit,myId,this.coloring)
         }
-        }else{
+        }else if(this.type == "jumper"){this.xvel = 0;this.yvel = 0}else{
           let dists = dist(this.x,this.y,block.x,block.y);
           let speed = dist(this.xvel,this.yvel,0,0);
         this.x=block.x-(block.x-this.x)/dists*(block.radius+15);
@@ -247,6 +254,7 @@ if(this.canMove){
             }
            }
          this.kill();
+        // if (this.type != "jumper"){
          let base = atan2(this.y-block.y,this.x-block.x)
         for(let i=0; i<13; i++){
           let power = random(10,20);
@@ -259,6 +267,7 @@ if(this.canMove){
           let angle = random(base-15,base+15);
           particles[particles.length] = new Particle(this.x,this.y,cos(angle)*power,sin(angle)*power,this.emit,myId,this.coloring)
         }
+      // }
       }
   }
 }
@@ -278,6 +287,29 @@ if(this.canMove){
         pg.vertex(cos(360/7*i)*20,sin(360/7*i)*20);
       }
       pg.endShape(CLOSE);
+      pg.pop();
+    }
+ if(this.type=="jumper"){
+      this.life-=0.2;
+   this.size+=0.8
+      pg.push();
+      pg.translate(this.x,this.y);
+      pg.strokeWeight(10);
+      pg.noFill();
+      pg.fill(20);
+      pg.stroke(this.coloring);
+    if (this.playerId!=myId){
+     let splits = this.coloring.split(")")
+     let s1 = splits[0].split("(")
+     let s = s1[1].split(",")
+     pg.stroke(s[0],s[1],s[2],30);
+   }
+      pg.beginShape();
+      for(let i=0; i<7; i++){
+        pg.vertex(cos(360/7*i)*this.size/2,sin(360/7*i)*this.size/2);
+      }
+      pg.endShape(CLOSE);
+   
       pg.pop();
     }
 if(this.type=="phase"){

@@ -1,8 +1,8 @@
-var gunData = {"common": {zoom: 0.6, reload: 1.55,recoil: 0.5,display: "Common",regen: 2.5,details:"Shoots a single bullet!"},"spike": {zoom: 0.7, reload: 1.9,recoil: 4, display: "Spike",regen: 2.5,details:"Shoots four short spikes!"},"homing": {zoom: 0.5, reload: 1.6,recoil: 2,display: "Navigation",regen: 3,details:"Bullets avoid nearby walls!"},"bounce": {zoom: 0.7, reload: 1.2,recoil: 2,display: "Bounce",regen: 2.5,details:"Bullets bounce off walls!"},"magic": {zoom: 0.6, reload: 1.2, recoil: 0, display: "Magic",regen: 3.5,details:"Bullets moves towards nearby enemies!"},"shock": {zoom: 0.5, reload: 1.1, recoil: 3,display:"Shockwave",regen: 3,details:"Shoots a barrage of bullets!"},"dash": {zoom: 0.7, reload: 1.5, recoil: -4.5,display:"Dash",regen: 2,details:"Boosts the player forwards!"},"nuclex": {zoom: 0.53, reload: 1.35, recoil: 1,display:"Nuclex",regen: 3,details:"Bullets oscillate back and forth!"}, "recall": {zoom: 0.6, reload: 2, recoil: 0.5,display:"Reverb",regen: 1.9,details:"Bullets slowly start backtracking!"}, "bomb": {zoom: 0.6,reload: 1.7,recoil: 2,display:"Bomb",regen: 3.5,details:"Explodes with bullets on hit!"}, "snipe": {zoom: 0.4,reload:1.1,recoil:3,display:"Sniper",regen: 4,details:"Fast bullets deal double damage!"}, "phase":{zoom: 0.6,reload: 1.65,recoil: 1.6,display:"Phase",regen: 2.7,details:"Triples bullets through walls!"}};
+var gunData = {"common": {zoom: 0.6, reload: 1.55,recoil: 0.5,display: "Common",regen: 2.5,details:"Shoots a single bullet!"},"spike": {zoom: 0.7, reload: 1.9,recoil: 4, display: "Spike",regen: 2.5,details:"Shoots four short spikes!"},"homing": {zoom: 0.5, reload: 1.6,recoil: 2,display: "Navigation",regen: 3,details:"Bullets avoid nearby walls!"},"bounce": {zoom: 0.7, reload: 1.2,recoil: 2,display: "Bounce",regen: 2.5,details:"Bullets bounce off walls!"},"magic": {zoom: 0.6, reload: 1.2, recoil: 0, display: "Magic",regen: 3.5,details:"Bullets moves towards nearby enemies!"},"shock": {zoom: 0.5, reload: 1.1, recoil: 3,display:"Shockwave",regen: 3,details:"Shoots a barrage of bullets!"},"dash": {zoom: 0.7, reload: 1.5, recoil: -4.5,display:"Dash",regen: 2,details:"Boosts the player forwards!"},"nuclex": {zoom: 0.53, reload: 1.35, recoil: 1,display:"Nuclex",regen: 3,details:"Bullets oscillate back and forth!"}, "recall": {zoom: 0.6, reload: 2, recoil: 0.5,display:"Reverb",regen: 1.45,details:"Bullets slowly start backtracking!"}, "bomb": {zoom: 0.6,reload: 1.7,recoil: 2,display:"Bomb",regen: 3.5,details:"Explodes with bullets on hit!"}, "snipe": {zoom: 0.4,reload:1.1,recoil:3,display:"Sniper",regen: 4,details:"Fast bullets deal double damage!"}, "phase":{zoom: 0.5,reload: 1.2,recoil: 1.6,display:"Phase",regen: 2.7,details:"Triples bullets through walls!"},"jumper":{zoom: 0.55,reload: 1.1,recoil: 1.8,display:"Jumper",regen: 2.9,details:"Jumps people!"}};
 //"range": {zoom: 0.75, reload: 1.5,recoil: 2, display: "Ranger",regen: 1.5},
 let guns = Object.keys(gunData);
 var colors = ['rgb(141,236,243)','rgb(246,161,161)','rgb(241,221,135)','rgb(155,243,168)','rgb(141,176,244)','rgb(237,161,248)'];
-var faces = ["scared","happy","evil","dead"];
+var faces = ["scared","happy","evil","dead","shocked","sad","bruh","money","derp","ah"];
 var user ="";
 var shake = 0
 var bullets = [];
@@ -37,6 +37,7 @@ function setup(){
   myIP = ipData.ip;
   print(myIP)
   let canvas = createCanvas(1280, 720, WEBGL);
+  canvas.style('cursor', 'none');
   canvas.position(-width / 2, 0);
   pg = createGraphics(width, height);
   angleMode(DEGREES);
@@ -52,9 +53,9 @@ function setup(){
   pg.strokeWeight(10);
   player=new Player(640, 360);
   loadSocket();
+  setInterval(CustomDraw, 1000/60);
   emptySound.loop();
   emptySound.setVolume(0);
-  setInterval(CustomDraw, 1000/60);
   changeObjects[changeObjects.length] = new WorldObject(width/2,height/2-safeRadius+130,80,"Gun","static");
    changeObjects[changeObjects.length] = new WorldObject(width/2,height/2+safeRadius-130,80,"Player","static");
   changeObjects[changeObjects.length] = new WorldObject(width/2-safeRadius+130,height/2,80,"Color","static");
@@ -70,6 +71,10 @@ var frameCounts = 0;
 var zoom = 0.6;
 var safeRadius = 600;
 function CustomDraw(){
+  if(frameCounts%5==0){
+    socket.emit("updateCursor", {});
+  }
+  //print(cursors)
   if(screen>0){
     playingTime++;
   }
@@ -172,6 +177,35 @@ function CustomDraw(){
     coloring: player.coloring,
     cRoom: currentRoom,
 */
+    pg.push()
+    let angle = atan2(360-cameras.y,640-cameras.x)+90;
+      pg.push();
+      pg.resetMatrix();
+      pg.translate(width/2,height/2);
+      pg.rotate(angle);
+      pg.strokeWeight(10);
+    let targetV = createVector(cameras.x-width/2,cameras.y-height/2);
+    targetV.normalize();
+    targetV.mult(safeRadius+100)
+    let targetX = width/2+targetV.x;
+    let targetY = height/2+targetV.y;
+    
+      let dists = dist(targetX,targetY,cameras.x,cameras.y);
+      let baseR = (-dists+((-abs((abs(max(-min((width/zoom)/2*(1/abs(cos(angle+90))),(height/zoom)/2*(1/abs(cos(angle)))),-dist(targetX,targetY,cameras.x,cameras.y))+100)))+dists)));
+      let radius2 =baseR*zoom;
+      
+     // print(((-abs((abs(max(-min((width/zoom)/2*(1/abs(cos(angle+90))),(height/zoom)/2*(1/abs(cos(angle)))),-dist(chosen.x,chosen.y,cameras.x,cameras.y))+100)))+dists)))
+      pg.translate(0,radius2);
+      pg.stroke("rgba(150,255,200,0.8)");
+      
+    
+    let size = min(5,(dist(640,360,cameras.x,cameras.y)/200*zoom));
+      if(size>0&&dist(player.x,player.y,width/2,height/2)>=50+radius){
+        pg.strokeWeight(size*2)
+      pg.line(-2*size,size,0,-size);
+      pg.line(2*size,size,0,-size);
+      }
+    pg.pop()
 for(let i of Object.keys(players)){
     if(i!=myId){
       let item = players[i];
@@ -375,6 +409,25 @@ var currentMessage = "";
 var showDetails = false;
 function keyPressed(){
   let noKeys = ["Shift","Meta","CapsLock","Control","Alt","Command","Option","Enter","Backspace","ArrowUp","ArrowLeft","ArrowRight","ArrowDown","Escape","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"];
+  for(let block of changeObjects){
+  if (dist(player.x,player.y,block.x,block.y)<block.radius+50){
+    let len = guns.length;
+      if(block.type=="Face"){
+       len = faces.length;
+       }else if(block.type=="Color"){
+         len = colors.length;
+       }else if(block.type=="Player"){
+         len = Object.keys(helpMsgs).length;
+       }
+    if(!typing){
+          if (key=="q"){
+            block.gunStage+=len-1;
+          }else if (key == "e"){
+            block.gunStage++;
+          }
+  }
+        }
+}
   if(key==" "&&screen>0&&!typing){
     attemptShoot();
   }
@@ -706,13 +759,15 @@ function attemptShoot(){
       }else if(player.gunType=="shock"){
          bulletV.mult(14.5);
       }else if(player.gunType=="recall"){
-         bulletV.mult(30);
+         bulletV.mult(min(dist(mouse.x,mouse.y,player.x,player.y)/20,dist(width/2,height/2,width,height)/20));
       }else if(player.gunType=="nuclex"){
          bulletV.mult(20);
       }else if(player.gunType=="snipe"){
          bulletV.mult(43);
       }else if(player.gunType=="phase"){
         bulletV.mult(30)
+      }else if(player.gunType=="jumper"){
+        bulletV.mult(18)
       }else{
         bulletV.mult(30);
       }
@@ -798,6 +853,29 @@ function mousePressed(){
     if(lobbyCode==""){
     lobbyType = false
     }
+  }
+  //royale
+  if (rectHit(brx,500,mouse.x,mouse.y,150,70,5,5)&&screen==0){
+    if (usernameText){
+    let code = generateCode();
+      print(room)
+   // createRoom(code)
+    //joinRoom(code)
+     let highest = "NONE";
+     for(let keyR in availableRooms){
+         
+     }
+    room = code;
+    screen = 1
+    copyStringToClipboard(code)
+    user=usernameText
+    player.displayName=usernameText
+      setNoiseSeed();
+      
+    }else{
+      roomError(0)
+    }
+    // currentRoom = true
   }
   if (rectHit(rx4,600,mouse.x,mouse.y,400,70,5,5)&&screen==0){
     usernameType = true

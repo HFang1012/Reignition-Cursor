@@ -24,6 +24,7 @@ class WorldObject{
         this.sizeVel/=1.2;
         this.sizeVel+=(this.baseRadius-this.radius)/10;
         let chosenGun = guns[this.gunStage%guns.length];
+        
     pg.push();
     pg.translate(this.x,this.y);
          pg.rotate(-frameCounts*0.5)
@@ -47,7 +48,7 @@ class WorldObject{
         pg.fill(player?.coloring)
                 pg.stroke(player?.coloring)
         pg.textAlign(CENTER,BOTTOM);
-        pg.text(`Weapon:\n${gunData[chosenGun].display}`,0,205);
+        pg.text(`Switch to Weapon:\n${gunData[chosenGun].display}`,0,205);
         pg.pop();
     mouseSprite(this.x,this.y,player.coloring,{prog: frameCounts,dir: 1,tween: 10+sin(frameCounts*5)*2.5, tweenVel: 0},3,chosenGun);
         pg.fill(20);
@@ -62,6 +63,7 @@ class WorldObject{
           particles[particles.length] = new Particle(this.x+cos(angle)*(this.baseRadius+40),this.y+sin(angle)*(this.baseRadius+40),cos(angle)*3,sin(angle)*3,"Shape",myId,player.coloring)
         }
         }
+        this.bullet.size = min(90,this.bullet.size);
         this.bullet.xvel = cos(frameCounts);
         this.bullet.yvel = sin(frameCounts);
         this.bullet.coloring = player.coloring;

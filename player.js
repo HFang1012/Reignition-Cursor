@@ -12,7 +12,7 @@ class Player{
     this.maxHealth = 7;
     this.id = myId;
     this.gunType = guns[floor(random(0,guns.length))];
-   this.gunType="phase"
+   this.gunType="jumper"
    // this.gunType="homin
     this.direction = {x: 0, y: 0};
     this.directionTween = {x:0,y:0};
@@ -35,6 +35,7 @@ class Player{
     this.count = 0;
   }
   work() {
+    // this.gunType="jumper"
     if(frameCounts%(60*(gunData[this.gunType].regen-0.5))==0&&this.ammo<6){
        this.ammo+=1;
       mouseProg.tweenVel-=10;
@@ -160,6 +161,54 @@ class Player{
       pg.textSize(100)
       pg.strokeWeight(1);
     pg.text("~",0,5);
+    }else if (this.face=="shocked"){
+       pg.textSize(50)
+      pg.strokeWeight(3);
+      pg.text("o",-19,-12);
+    pg.text("o",19,-12);
+      pg.textSize(100)
+      pg.strokeWeight(1);
+    pg.text("-",0,5);
+    }else if (this.face=="sad"){
+       pg.textSize(50)
+      pg.strokeWeight(3);
+   //   pg.text("o",-19,-12);
+  //  pg.text("o",19,-12);
+      pg.textSize(70)
+      pg.strokeWeight(1);
+    pg.text(";-;",0,-6);
+    }else if (this.face=="money"){
+       pg.textSize(50)
+      pg.strokeWeight(3);
+      pg.text("$",-19,-10);
+    pg.text("$",19,-10);
+      pg.textSize(100)
+      pg.strokeWeight(1);
+    pg.text("-",0,8);
+    }else if (this.face=="ah"){
+       pg.textSize(50)
+      pg.strokeWeight(3);
+      pg.text("@",-15,-7);
+    pg.text("@",15,-7);
+      pg.textSize(100)
+      pg.strokeWeight(1);
+    pg.text(".",0,8);
+    }else if (this.face=="bruh"){
+       pg.textSize(50)
+      pg.strokeWeight(3);
+      pg.text("_",-19,-25);
+    pg.text("_",19,-25);
+      pg.textSize(100)
+      pg.strokeWeight(1);
+    pg.text("-",0,5);
+    }else if (this.face=="derp"){
+       pg.textSize(50)
+      pg.strokeWeight(3);
+      pg.text(".",-22,-20);
+    pg.text(".",22,-20);
+      pg.textSize(100)
+      pg.strokeWeight(1);
+    pg.text("-",0,5);
     }
     pg.pop();
     
