@@ -187,15 +187,13 @@ bullets[bullets.length]=new Bullet(data.bulletData.x,data.bulletData.y,data.bull
       bullets[index].damage(data.bulletData.pId, data.bulletData.damage);
     }
 });
-  createRoom(room)
-  joinRoom(room);
 }
 var addedBullets = [];
 // sending your own updates
-function createRoom(roomName) {
+function createRoom(roomData) {
   if (!roomName) return;
-  socket.emit("create_room", roomName);
-  currentRoom = roomName
+  socket.emit("create_room", roomData);
+  currentRoom = roomData.name
 }
 
 function joinRoom(roomName) {

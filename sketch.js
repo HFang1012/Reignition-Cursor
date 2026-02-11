@@ -889,7 +889,7 @@ function mousePressed(){
   if (rectHit(rx2,500,mouse.x,mouse.y,150,70,5,5)&&screen==0){
     if (usernameText){
     let code = generateCode()
-    createRoom(code)
+    createRoom({name: code, type: "custom"})
     joinRoom(code)
     room = code;
     screen = 1
