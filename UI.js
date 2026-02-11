@@ -38,7 +38,7 @@ function selectionPage(){
   
   if (usernameText.length==0&&!usernameType){
     // pg.stroke(150)
-    pg.text('USERNAME',rx4,600)
+    pg.text(`USERNAME`,rx4,600)
   }else{
     pg.text(`${usernameText}${(usernameType&&frameCounts%40>20) ? "|" : " "}`,rx4,600)
   }
