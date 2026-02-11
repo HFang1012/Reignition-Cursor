@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "dev": "live-server",
+    "build": "echo \"No build step for static project\""
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

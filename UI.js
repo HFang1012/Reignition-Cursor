@@ -53,7 +53,7 @@ function selectionPage(){
   pg.textSize(120)
   pg.textAlign(CENTER,CENTER)
   pg.text('REIGNITION\nCURSOR',1280/2,200+sin(frameCounts*3)*10)
-   pg.textSize(70)
+   pg.textSize(70) 
   pg.strokeWeight(2)
   pg.text('The Game',1280/2,370+sin(frameCounts*3)*10)
   pg.noFill()
