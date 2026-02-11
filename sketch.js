@@ -637,7 +637,6 @@ function keyPressed(){
           }
        joinRoom(lobbyCode)
     room = lobbyCode;
-    screen = 1
     user=usernameText
     player.displayName=usernameText
       lobbyCode = "";
@@ -858,7 +857,6 @@ function mousePressed(){
   if (rectHit(brx,500,mouse.x,mouse.y,200,70,5,5)&&screen==0){
     if (usernameText){
     let code = generateCode();
-      print(room)
    // createRoom(code)
     //joinRoom(code)
      let highest = "NONE";
@@ -866,7 +864,6 @@ function mousePressed(){
          
      }
     room = code;
-    screen = 1
     copyStringToClipboard(code)
     user=usernameText
     player.displayName=usernameText
@@ -892,7 +889,6 @@ function mousePressed(){
     createRoom({name: code, type: "custom"})
     joinRoom(code)
     room = code;
-    screen = 1
     copyStringToClipboard(code)
     user=usernameText
     player.displayName=usernameText
@@ -906,7 +902,6 @@ function mousePressed(){
      if(Object.keys(availableRooms).includes(lobbyCode)&&screen==0&&usernameText){
        joinRoom(lobbyCode)
     room = lobbyCode;
-    screen = 1
     user=usernameText
     player.displayName=usernameText
        setNoiseSeed();

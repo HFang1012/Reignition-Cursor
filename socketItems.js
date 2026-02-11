@@ -66,7 +66,6 @@ socket = io("https://mmorpg-2if7.onrender.com");
 // When connected
 socket.on("connect", () => {
   myId = socket.id;
-  blocks=[];
   console.log("Connected myId:", `${myId}`);
   console.log("Generated Seed:", `${seed}`);
   console.log("Current Room Name:", room);
@@ -194,11 +193,14 @@ function createRoom(roomData) {
   if (!roomName) return;
   socket.emit("create_room", roomData);
   currentRoom = roomData.name
+  room = roomData.name;
 }
 
 function joinRoom(roomName) {
   socket.emit("join_room", roomName);
   currentRoom = roomName
+  room = roomName;
+  screen = 1
 }
 function sendPlayerUpdate() {
   if(room=="NO ROOM") return;

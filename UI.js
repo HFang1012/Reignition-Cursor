@@ -76,12 +76,15 @@ function selectionPage(){
   pg.rect(rx,500,lobbyBoxSize,70,15)
   pg.strokeWeight(3)
   pg.fill(colors[4])
-  pg.stroke(colors[4])
-  
+  let setColor = `rgba(${colors[4].slice(4,colors[4].length-1)},${max(1-(rx-540)/50,0)})`
+  pg.stroke(setColor);
+  pg.fill(setColor);
+  pg.text(`LOBBY CODE`,540+80,500-(rx-540)*2)
   if (lobbyCode.length==0&&!lobbyType){
     // pg.stroke(150)
-    pg.text('LOBBY CODE',rx+80,500)
   }else{
+    pg.stroke(colors[4])
+    pg.fill(colors[4])
     pg.text(`${lobbyCode}${(lobbyTyper&&frameCounts%40>20) ? "|" : " "}`,rx,500)
   }
   pg.pop()
