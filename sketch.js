@@ -74,7 +74,8 @@ var safeRadius = 600;
 function CustomDraw(){
  player.id = myId;
  if(frameCounts%5==0){
-   socket.emit("updateCursor", {});
+   socket.emit("getRooms", {});
+   console.log(availableRooms);
  }
  //print(cursors)
  if(screen>0){
@@ -860,12 +861,17 @@ function mousePressed(){
  if (rectHit(brx,500,mouse.x,mouse.y,200,70,5,5)&&screen==0){
    if (usernameText){
    let code = generateCode();
-  // createRoom(code)
-   //joinRoom(code)
-    let highest = "NONE";
+   let highestRoom = {name: "NONE",players:0};
     for(let keyR in availableRooms){
-       
+       if(availableRooms[keyR]){
+
+       }
     }
+    if(highestRoom?.name=="NONE"){
+    createRoom({name: code, type: "royale"});
+    }
+    joinRoom(code)
+    gamemode = royale;
    room = code;
    copyStringToClipboard(code)
    user=usernameText

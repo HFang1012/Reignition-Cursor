@@ -131,7 +131,7 @@ socket.on("removePlayer", (id) => {
 });
 //availableRooms
  socket.on("gotRooms", (data) => {
- if(data.id!=myId){
+ if(data.id==myId){
  availableRooms=data.roomData;
 }
 })
@@ -190,6 +190,7 @@ bullets[bullets.length]=new Bullet(data.bulletData.x,data.bulletData.y,data.bull
      bullets[index].damage(data.bulletData.pId, data.bulletData.damage);
    }
 });
+
 }
 var addedBullets = [];
 // sending your own updates
