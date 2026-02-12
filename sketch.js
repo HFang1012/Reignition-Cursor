@@ -25,6 +25,7 @@ Version:
 -
  Spawn Details Clip, Added New Spawn Details
 */
+var gamemode = "custom";
 var ipData;
 var myIP;
 function preload(){

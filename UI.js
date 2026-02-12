@@ -4,7 +4,7 @@ var buttons = [[0,0,150,70,200,100]]
 var scl = 1
 var scls = 1
 var x = 1280/2-100
-var rx=1280/2-100
+var rx=1280/2-100;
 var lobbyType = false
 var lobbyTyper = false;
 var x2=1280/2+250
@@ -204,4 +204,3 @@ function generateCode() {
  }
  return id;
 }
-​​
