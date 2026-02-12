@@ -203,6 +203,7 @@ function createRoom(roomData) {
 
 function joinRoom(roomName) {
  socket.emit("join_room", roomName);
+ gamemode = "custom";
  currentRoom = roomName
  room = roomName;
  screen = 1

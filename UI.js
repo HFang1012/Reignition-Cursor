@@ -15,7 +15,7 @@ var enterScl = 1
 var enterScls = 1
 var usernameText = ''
 var x4 = 1280/2
-var rx4 = 1280/2
+var rx4 = 1280/2+40
 var usernameType = false
 var lobbyBoxSize = 500
 var lobbyBoxAim = 500
@@ -97,6 +97,27 @@ function selectionPage(){
  pg.scale(1/enterScl,1/enterScl)
  pg.translate(-rx3,-500)
  pg.pop()
+
+
+ pg.push()
+ pg.strokeWeight(10)
+ pg.noFill()
+ pg.stroke(colors[0])
+ pg.rect(1280/2-220,600,70,70,15)
+ pg.translate(1280/2-220,604)
+ pg.beginShape()
+ pg.vertex(-20,-10)
+ pg.curveVertex(-10,-20)
+ pg.vertex(0,-20)
+ pg.vertex(0,-5)
+ pg.vertex(-15,10)
+ pg.vertex(15,10)
+ pg.vertex(0,-5)
+ pg.vertex(0,-5)
+ pg.endShape()
+ pg.pop()
+
+ 
  if (errorTimer>0){
    pg.push()
    pg.textAlign(CENTER,CENTER)
@@ -203,4 +224,5 @@ function generateCode() {
    id += chars.charAt(floor(random(chars.length)));
  }
  return id;
+ 
 }
