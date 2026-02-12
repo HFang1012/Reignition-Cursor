@@ -15,6 +15,7 @@ var playingTime = 0;
 var helpMsgs = {"How to Play": `WASD or Arrow Keys To Move\nClick or Space to Shoot\nShoot Nodes To Change Stats\nEnter/Return to Open Chat\nTeams Are Sorted by Color\nHealth is Around Player\nAmmo is Around Cursor`,"Weapon Details": "Weapon","Developer Notes": `This Game is still in Development!\nMade By: HF_ang & Emey\nCreated With p5.js and socket.io\nReport Bugs to hfanggamedev\nVersion: ${version}\nHave Fun!!!`};
 //"Combat Tips": `Use the Arrow to Track Positions\nPredict Where Enemies are Moving\nUse Walls To Your Advantage\nUse Recoil For Movement\nSave Ammo, Drain Theirs\nMove In All Directions\nShoot Multiple Shots At Once`,
 var helpMsg = helpMsgs["How to Play"];
+var selectedItem = {...faces}
 /*
 Version:
  Prototyping Shooting and Socket
@@ -28,6 +29,7 @@ Version:
 var gamemode = "custom";
 var ipData;
 var myIP;
+var enables = {spawn: true};
 function preload(){
  pixelShader = loadShader("pixel.vert", "pixel.frag");
  emptySound = loadSound("empty-1.mp3")
@@ -57,10 +59,6 @@ function setup(){
  setInterval(CustomDraw, 1000/60);
  emptySound.loop();
  emptySound.setVolume(0);
- changeObjects[changeObjects.length] = new WorldObject(width/2,height/2-safeRadius+130,80,"Gun","static");
-  changeObjects[changeObjects.length] = new WorldObject(width/2,height/2+safeRadius-130,80,"Player","static");
- changeObjects[changeObjects.length] = new WorldObject(width/2-safeRadius+130,height/2,80,"Color","static");
- changeObjects[changeObjects.length] = new WorldObject(width/2+safeRadius-130,height/2,80,"Face","static");
 }
 var changeObjects = [];
 var mouse={x:0,y:0};
@@ -72,10 +70,21 @@ var frameCounts = 0;
 var zoom = 0.6;
 var safeRadius = 600;
 function CustomDraw(){
+  if(screen>0){
+  if(enables.spawn&&changeObjects.length<=0){
+changeObjects[changeObjects.length] = new WorldObject(width/2,height/2-safeRadius+130,80,"Gun","static");
+  changeObjects[changeObjects.length] = new WorldObject(width/2,height/2+safeRadius-130,80,"Player","static");
+ changeObjects[changeObjects.length] = new WorldObject(width/2-safeRadius+130,height/2,80,"Color","static");
+ changeObjects[changeObjects.length] = new WorldObject(width/2+safeRadius-130,height/2,80,"Face","static");
+  }
+  if(!enables.spawn){
+changeObjects = [];
+  }
+}
  player.id = myId;
  if(frameCounts%5==0){
-   socket.emit("getRooms", {});
-   console.log(availableRooms);
+   socket.emit("getRooms", {room: room});
+  // console.log(availableRooms);
  }
  //print(cursors)
  if(screen>0){
@@ -857,21 +866,31 @@ function mousePressed(){
    lobbyType = false
    }
  }
+ if (rectHit(1280/2-220,600,mouse.x,mouse.y,70,70,5,5)&&screen==0){
+   lobbyType = false
+   lobbyTyper=false;
+   hanger = true
+ }
  //royale
  if (rectHit(brx,500,mouse.x,mouse.y,200,70,5,5)&&screen==0){
    if (usernameText){
-   let code = generateCode();
+   let code = "NONE";
    let highestRoom = {name: "NONE",players:0};
+   // rooms[roomData.name] = { players: {}, blocks: {},
+   // type: roomData?.type ?? "custom",started: false, startingPlayers: {}};
     for(let keyR in availableRooms){
-       if(availableRooms[keyR]){
-
+       if(availableRooms[keyR].type=="royale"){
+          highestRoom = {name: keyR, players: Object.keys(availableRooms[keyR].players).length};
        }
     }
     if(highestRoom?.name=="NONE"){
-    createRoom({name: code, type: "royale"});
+      createRoom({name: code, type: "royale"});
+      code = generateCode();
+    }else{
+      code = highestRoom.name;
     }
     joinRoom(code)
-    gamemode = royale;
+    gamemode = "royale";
    room = code;
    copyStringToClipboard(code)
    user=usernameText

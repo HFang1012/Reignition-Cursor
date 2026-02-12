@@ -22,6 +22,9 @@ var lobbyBoxAim = 500
 var brx = 270
 var rbrs = 1
 var brs = 1
+
+var hanger = false;
+
 function selectionPage(){
  pg.translate(random(-shake,shake),random(-shake,shake));
  shake/=2;
@@ -153,6 +156,38 @@ function selectionPage(){
    pg.translate(-brx,-500)
    pg.pop();
  }
+ 
+if (hanger){
+  pg.push()
+  pg.strokeWeight(10)
+  pg.fill(20)
+  pg.stroke(colors[0])
+  pg.rect(1280/2,360,width-100,height-100,15)
+  pg.noFill()
+  let yh = 120
+  let offset = 10
+  let facesx = 220-offset
+  let crossx = 1280/2-145-offset
+  let gunsx = 1280*0.75-190-offset
+  pg.ellipse(1160,yh,70,70)
+  pg.rect(facesx,yh,250,70,15)
+  pg.rect(crossx,yh,250,70,15)
+  pg.rect(gunsx,yh,250,70,15)
+  pg.line(920,50,920,670)
+  for (let i = 0; i<Object.keys(selectedItem).length; i++){
+    pg.rect(100+i*100,200,100,100,15)
+  }
+  pg.fill(colors[0])
+  pg.textAlign(CENTER,CENTER)
+  pg.textSize(45)
+  pg.strokeWeight(3)
+  pg.text("Faces",facesx,yh)
+  pg.text("Crosshairs", crossx,yh)
+  pg.text("Guns", gunsx,yh)
+  pg.pop()
+}
+
+
   //x,y,x2,y2,xs,ys,xs2,ys2
  if (rectHit(rx2,500,mouse.x,mouse.y,150,70,5,5)){
    scls = 1.2

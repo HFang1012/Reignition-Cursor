@@ -1,5 +1,5 @@
 var socket;
-var currentRoom = null;
+var currentRoom ="NO ROOM";
 var cursors = {};
 var players = {};
 var chunkData = {};
@@ -59,7 +59,7 @@ function loadChunk(x,y){
 var availableRooms = {};
 function loadSocket(){
 socket = io("https://mmorpg-2if7.onrender.com");
-
+//https://mmorpg-2if7.onrender.com
 
 
 
@@ -131,8 +131,12 @@ socket.on("removePlayer", (id) => {
 });
 //availableRooms
  socket.on("gotRooms", (data) => {
- if(data.id==myId){
- availableRooms=data.roomData;
+  //console.log(2)
+  if(data.id==myId){
+    availableRooms = {};
+  for(let keyd of Object.keys(data.roomData)){
+   availableRooms[keyd] = data.roomData[keyd];
+ }
 }
 })
 // Position updates from other players in room
@@ -190,7 +194,8 @@ bullets[bullets.length]=new Bullet(data.bulletData.x,data.bulletData.y,data.bull
      bullets[index].damage(data.bulletData.pId, data.bulletData.damage);
    }
 });
-
+createRoom({name: "NO ROOM", type: "custom"});
+socket.emit("join_room","NO ROOM");
 }
 var addedBullets = [];
 // sending your own updates
