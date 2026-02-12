@@ -1,9 +1,12 @@
-var gunData = {"common": {zoom: 0.6, reload: 1.55,recoil: 0.5,display: "Common",regen: 2.5,details:"Shoots a single bullet!"},"spike": {zoom: 0.7, reload: 1.9,recoil: 4, display: "Spike",regen: 2.5,details:"Shoots four short spikes!"},"homing": {zoom: 0.5, reload: 1.6,recoil: 2,display: "Navigation",regen: 3,details:"Bullets avoid nearby walls!"},"bounce": {zoom: 0.7, reload: 1.2,recoil: 2,display: "Bounce",regen: 2.5,details:"Bullets bounce off walls!"},"magic": {zoom: 0.6, reload: 1.2, recoil: 0, display: "Magic",regen: 3.5,details:"Bullets moves towards nearby enemies!"},"shock": {zoom: 0.5, reload: 1.1, recoil: 3,display:"Shockwave",regen: 3,details:"Shoots a barrage of bullets!"},"dash": {zoom: 0.7, reload: 1.5, recoil: -4.5,display:"Dash",regen: 2,details:"Boosts the player forwards!"},"nuclex": {zoom: 0.53, reload: 1.35, recoil: 1,display:"Nuclex",regen: 3,details:"Bullets oscillate back and forth!"}, "recall": {zoom: 0.6, reload: 2, recoil: 0.5,display:"Reverb",regen: 1.45,details:"Bullets slowly start backtracking!"}, "bomb": {zoom: 0.6,reload: 1.7,recoil: 2,display:"Bomb",regen: 3.5,details:"Explodes with bullets on hit!"}, "snipe": {zoom: 0.4,reload:1.1,recoil:3,display:"Sniper",regen: 4,details:"Fast bullets deal double damage!"}, "phase":{zoom: 0.5,reload: 1.2,recoil: 1.6,display:"Phase",regen: 2.7,details:"Triples bullets through walls!"},"jumper":{zoom: 0.55,reload: 1.1,recoil: 1.8,display:"Jumper",regen: 2.9,details:"Jumps people!"}};
-//"range": {zoom: 0.75, reload: 1.5,recoil: 2, display: "Ranger",regen: 1.5},
+var gunData = {"common": {zoom: 0.6, reload: 1.55,recoil: 0.5,display: "Common",regen: 2.5,details:"Shoots a single bullet!"},"spike": {zoom: 0.7, reload: 1.9,recoil: 4, display: "Spike",regen: 2.5,details:"Shoots four short spikes!"},"homing": {zoom: 0.5, reload: 1.6,recoil: 2,display: "Navigation",regen: 3,details:"Bullets avoid nearby walls!"},"bounce": {zoom: 0.7, reload: 1.2,recoil: 2,display: "Bounce",regen: 2.5,details:"Bullets bounce off walls!"},"magic": {zoom: 0.6, reload: 1.2, recoil: 0, display: "Magic",regen: 3.5,details:"Bullets moves towards nearby enemies!"},"shock": {zoom: 0.5, reload: 1.1, recoil: 3,display:"Shockwave",regen: 3,details:"Shoots a barrage of bullets!"},"dash": {zoom: 0.7, reload: 1.5, recoil: -4.5,display:"Dash",regen: 2,details:"Boosts the player forwards!"},"nuclex": {zoom: 0.53, reload: 1.35, recoil: 1,display:"Nuclex",regen: 3,details:"Bullets oscillate back and forth!"}, "recall": {zoom: 0.6, reload: 2, recoil: 0.5,display:"Reverb",regen: 1.45,details:"Bullets slowly start backtracking!"}, "snipe": {zoom: 0.4,reload:1.1,recoil:3,display:"Sniper",regen: 4,details:"Fast bullets deal double damage!"}, "phase":{zoom: 0.5,reload: 1.2,recoil: 1.6,display:"Phase",regen: 2.7,details:"Triples bullets through walls!"}};
+//"range": {zoom: 0.75, reload: 1.5,recoil: 2, display: "Ranger",regen: 1.5},"bomb": {zoom: 0.6,reload: 1.7,recoil: 2,display:"Bomb",regen: 3.5,details:"Explodes with bullets on hit!"}
+//"jumper":{zoom: 0.55,reload: 1.1,recoil: 1.8,display:"Jumper",regen: 2.9,details:"Jumps people!"}
 let guns = Object.keys(gunData);
 var colors = ['rgb(141,236,243)','rgb(246,161,161)','rgb(241,221,135)','rgb(155,243,168)','rgb(141,176,244)','rgb(237,161,248)'];
 var faces = ["scared","happy","evil","dead","shocked","sad","bruh","money","derp","ah"];
 var user ="";
+var crosshairs = ["cross","circle",""];
+var playerGuns = ["basic","arrow","fork","silencer"];
 var shake = 0
 var bullets = [];
 var emptySound;
@@ -15,7 +18,7 @@ var playingTime = 0;
 var helpMsgs = {"How to Play": `WASD or Arrow Keys To Move\nClick or Space to Shoot\nShoot Nodes To Change Stats\nEnter/Return to Open Chat\nTeams Are Sorted by Color\nHealth is Around Player\nAmmo is Around Cursor`,"Weapon Details": "Weapon","Developer Notes": `This Game is still in Development!\nMade By: HF_ang & Emey\nCreated With p5.js and socket.io\nReport Bugs to hfanggamedev\nVersion: ${version}\nHave Fun!!!`};
 //"Combat Tips": `Use the Arrow to Track Positions\nPredict Where Enemies are Moving\nUse Walls To Your Advantage\nUse Recoil For Movement\nSave Ammo, Drain Theirs\nMove In All Directions\nShoot Multiple Shots At Once`,
 var helpMsg = helpMsgs["How to Play"];
-var selectedItem = {...faces}
+var selectedItem = {...faces};
 /*
 Version:
  Prototyping Shooting and Socket
@@ -32,7 +35,7 @@ var myIP;
 var enables = {spawn: true};
 function preload(){
  pixelShader = loadShader("pixel.vert", "pixel.frag");
- emptySound = loadSound("empty-1.mp3")
+ emptySound = loadSound("empty-1.mp3");
  let url = "https://api.ipify.org?format=json";
  ipData = loadJSON(url);
 }
@@ -59,6 +62,7 @@ function setup(){
  setInterval(CustomDraw, 1000/60);
  emptySound.loop();
  emptySound.setVolume(0);
+ examplePlayer = new Player(0,0,0,0,0,0,0,0,0,0,0,0,0);
 }
 var changeObjects = [];
 var mouse={x:0,y:0};
@@ -69,6 +73,7 @@ var cameras = {x:640/2,y:360/2};
 var frameCounts = 0;
 var zoom = 0.6;
 var safeRadius = 600;
+var worldBorder = 3000;
 function CustomDraw(){
   if(screen>0){
   if(enables.spawn&&changeObjects.length<=0){
@@ -81,6 +86,7 @@ changeObjects[changeObjects.length] = new WorldObject(width/2,height/2-safeRadiu
 changeObjects = [];
   }
 }
+enables.spawn = gamemode!="royale";
  player.id = myId;
  if(frameCounts%5==0){
    socket.emit("getRooms", {room: room});
@@ -91,9 +97,10 @@ changeObjects = [];
    playingTime++;
  }
  if(keyIsDown(86)&&!typing&&screen>0){
-   zoom+=((0.1)-zoom)/5
+  zoom+=((0.1)-zoom)/5
  }else{
- zoom+=((gunData[player.gunType].zoom ?? 1)-zoom)/10
+ //zoom+=((gunData[player.gunType].zoom ?? 1)-zoom)/10
+ zoom+=((gunData[player.gunType]?.zoom ?? 1)-zoom)/10;
   }
  canvas.style.cursor = 'none';
 // print(blocks.length)
@@ -135,7 +142,19 @@ changeObjects = [];
  pg.scale(zoom,zoom)
  pg.translate(-cameras.x,-cameras.y)
  shake/=2.5
-  
+ //worldBorder
+ if(true){
+  pg.push();
+let radius = worldBorder;
+pg.noFill();
+   pg.strokeWeight(10);
+   pg.stroke("rgba(254, 157, 157, 0.8)");
+  for(let i=0; i<worldBorder/20; i++){
+     pg.arc(width/2,height/2,radius*2,radius*2,i*360/worldBorder*20,(i+0.6)*360/worldBorder*20);
+  } 
+   pg.pop();
+  }
+  if(enables.spawn){
    pg.push();
    pg.noFill();
    pg.strokeWeight(10);
@@ -144,13 +163,8 @@ changeObjects = [];
  for(let i=0; i<30; i++){
    pg.arc(width/2,height/2,radius*2,radius*2,i*360/30,(i+0.4)*360/30);
  }
-   if(dist(player.x,player.y,width/2,height/2)<=50+radius){
-          if(player.maxHealth-player.health>0){
-    hitParticleQueue[hitParticleQueue.length] = {id: myId, damage: `+${player.maxHealth-player.health}`, coloring: "rgb(150,255,200)"};
- }
-   player.health=player.maxHealth;
-   }
    pg.pop();
+  }
  for(let i=particles.length-1; i>=0; i--){
    if(particles[i].layer==0){
    particles[i].work();
@@ -188,6 +202,7 @@ changeObjects = [];
    coloring: player.coloring,
    cRoom: currentRoom,
 */
+if(enables.spawn){
    pg.push()
    let angle = atan2(360-cameras.y,640-cameras.x)+90;
      pg.push();
@@ -211,13 +226,14 @@ changeObjects = [];
     
   
    let size = min(5,(dist(640,360,cameras.x,cameras.y)/200*zoom));
-     if(size>0&&dist(player.x,player.y,width/2,height/2)>=50+radius){
+     if(size>0&&dist(player.x,player.y,width/2,height/2)>=50+safeRadius){
        pg.strokeWeight(size*2)
      pg.line(-2*size,size,0,-size);
      pg.line(2*size,size,0,-size);
      pg.ellipse(0,size*5,size/2,size/2);
      }
    pg.pop()
+ }
 for(let i of Object.keys(players)){
    if(i!=myId){
      let item = players[i];
@@ -281,6 +297,7 @@ for(let i=particles.length-1; i>=0; i--){
    }
    }
  }
+ if(enables.spawn){
      pg.push();
 pg.beginClip({ invert: true });
 pg.fill(255);
@@ -296,6 +313,7 @@ let tintV = min((1- dist(player.x,player.y,width/2,height/2) /(200+safeRadius)) 
        pg.textAlign(CENTER,CENTER);
        pg.text(helpMsg,0,0);
        pg.pop();
+ }
   mouseSprite(mouse.x,mouse.y,player.coloring,mouseProg,player.ammo,player.gunType);
  for(let i of Object.keys(cursors)){
    if(i!=myId){
@@ -1099,22 +1117,15 @@ function rectHit(x,y,x2,y2,xs,ys,xs2,ys2){
  return(abs(x-x2)<xs/2+xs2/2&&abs(y-y2)<ys/2+ys2/2);
 }
 function copyStringToClipboard(str) {
- // Replace literal newlines with escaped \n
  const escapedStr = str.replace(/\n/g, '\\n');
-  // Create new element
  var el = document.createElement('textarea');
- // Set value (string to be copied)
  el.value = escapedStr;
- // Set non-editable to avoid focus and move outside of view
  el.setAttribute('readonly', '');
  el.style.position = 'absolute';
  el.style.left = '-9999px';
  document.body.appendChild(el);
- // Select text inside element
  el.select();
- // Copy text to clipboard
  document.execCommand('copy');
- // Remove temporary element
  document.body.removeChild(el);
  console.log("Copied To Clipboard!");
 }

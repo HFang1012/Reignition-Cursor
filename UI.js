@@ -22,10 +22,17 @@ var lobbyBoxAim = 500
 var brx = 270
 var rbrs = 1
 var brs = 1
+var mouseAvailable = false
+var tab = 0;
+var examplePlayer;
 
 var hanger = false;
 
 function selectionPage(){
+  
+  if (!mouseIsPressed&&!mouseAvailable){ 
+    mouseAvailable = true;
+  }
  pg.translate(random(-shake,shake),random(-shake,shake));
  shake/=2;
  pg.push()
@@ -45,7 +52,7 @@ function selectionPage(){
    pg.text(`${usernameText}${(usernameType&&frameCounts%40>20) ? "|" : " "}`,rx4,600)
  }
  pg.pop()
-  pg.push()
+ pg.push()
  pg.stroke('rgb(253,231,231)')
  pg.fill('rgb(253,231,231)')
  // pg.noFill()
@@ -167,22 +174,52 @@ if (hanger){
   let yh = 120
   let offset = 10
   let facesx = 220-offset
-  let crossx = 1280/2-145-offset
-  let gunsx = 1280*0.75-190-offset
+  let gunsx = 1280/2-145-offset
+  let crossx = 1280*0.75-190-offset
   pg.ellipse(1160,yh,70,70)
   pg.rect(facesx,yh,250,70,15)
   pg.rect(crossx,yh,250,70,15)
   pg.rect(gunsx,yh,250,70,15)
   pg.line(920,50,920,670)
-  for (let i = 0; i<Object.keys(selectedItem).length; i++){
-    pg.rect(100+i*100,200,100,100,15)
+  examplePlayer.x = 1060
+  examplePlayer.y = 400;
+  examplePlayer.coloring = colors[0];
+  examplePlayer.display();
+  for (let i = 0; i<Object.values(selectedItem).length; i++){
+    let x = 160+(i%6)*130;
+    let y = 250+floor(i/6)*130;
+    pg.push();
+    pg.rect(x,y,100,100,15);
+    if (tab ==0){
+    facesPage(Object.values(selectedItem)[i],x,y);
+    if (rectHit(x,y,mouse.x,mouse.y,100,100,5,5)&&mouseIsPressed&&mouseAvailable){
+    mouseAvailable = false;
+    examplePlayer.face = Object.values(selectedItem)[i];
+  }
+    }
+    
+  }
+  if (rectHit(facesx,yh,mouse.x,mouse.y,250,70,5,5)&&mouseIsPressed&&mouseAvailable){
+    mouseAvailable = false;
+    selectedItem = {...faces}
+    tab = 0;
+  }
+  if (rectHit(crossx,yh,mouse.x,mouse.y,250,70,5,5)&&mouseIsPressed&&mouseAvailable){
+    mouseAvailable = false;
+    selectedItem = {...crosshairs}
+    tab = 2;
+  }
+  if (rectHit(gunsx,yh,mouse.x,mouse.y,250,70,5,5)&&mouseIsPressed&&mouseAvailable){
+    mouseAvailable = false;
+    selectedItem = {...playerGuns}
+    tab = 1;
   }
   pg.fill(colors[0])
   pg.textAlign(CENTER,CENTER)
   pg.textSize(45)
   pg.strokeWeight(3)
   pg.text("Faces",facesx,yh)
-  pg.text("Crosshairs", crossx,yh)
+  pg.text("TBD", crossx,yh)
   pg.text("Guns", gunsx,yh)
   pg.pop()
 }
@@ -260,4 +297,92 @@ function generateCode() {
  }
  return id;
  
+}
+
+function facesPage(type,x,y){
+  pg.push();
+  pg.translate(x,y);
+  pg.fill(colors[0]);
+   pg.strokeWeight(1);
+   pg.textAlign(CENTER,CENTER);
+   pg.textSize(100)
+if(type=="scared"){
+   pg.text(".",-15,-35);
+   pg.text(".",15,-35);
+     pg.textSize(100);
+   pg.text("~",0,5);
+   }else if (type=="dead"){
+      pg.textSize(50)
+     pg.strokeWeight(3);
+     pg.text("x",-15,-15);
+   pg.text("x",15,-15);
+     pg.textSize(100)
+      pg.strokeWeight(1);
+   pg.text("-",0,5);
+   }else if (type=="happy"){
+     pg.textSize(50)
+     pg.strokeWeight(3);
+     pg.text("^",-20,-5);
+   pg.text("^",20,-5);
+     pg.textSize(100)
+     pg.strokeWeight(1);
+   pg.text("-",0,5);
+   }else if (type=="evil"){
+      pg.textSize(50)
+     pg.strokeWeight(3);
+     pg.text("*",-15,-4);
+   pg.text("*",15,-4);
+     pg.textSize(100)
+     pg.strokeWeight(1);
+   pg.text("~",0,5);
+   }else if (type=="shocked"){
+      pg.textSize(50)
+     pg.strokeWeight(3);
+     pg.text("o",-19,-12);
+   pg.text("o",19,-12);
+     pg.textSize(100)
+     pg.strokeWeight(1);
+   pg.text("-",0,5);
+   }else if (type=="sad"){
+      pg.textSize(50)
+     pg.strokeWeight(3);
+  //   pg.text("o",-19,-12);
+ //  pg.text("o",19,-12);
+     pg.textSize(70)
+     pg.strokeWeight(1);
+   pg.text(";-;",0,-6);
+   }else if (type=="money"){
+      pg.textSize(50)
+     pg.strokeWeight(3);
+     pg.text("$",-19,-10);
+   pg.text("$",19,-10);
+     pg.textSize(100)
+     pg.strokeWeight(1);
+   pg.text("-",0,8);
+   }else if (type=="ah"){
+      pg.textSize(50)
+     pg.strokeWeight(3);
+     pg.text("@",-15,-7);
+   pg.text("@",15,-7);
+     pg.textSize(100)
+     pg.strokeWeight(1);
+   pg.text(".",0,8);
+   }else if (type=="bruh"){
+      pg.textSize(50)
+     pg.strokeWeight(3);
+     pg.text("_",-19,-25);
+   pg.text("_",19,-25);
+     pg.textSize(100)
+     pg.strokeWeight(1);
+   pg.text("-",0,5);
+   }else if (type=="derp"){
+      pg.textSize(50)
+     pg.strokeWeight(3);
+     pg.text(".",-22,-20);
+   pg.text(".",22,-20);
+     pg.textSize(100)
+     pg.strokeWeight(1);
+   pg.text("-",0,5);
+   }
+   pg.pop()
 }

@@ -61,12 +61,6 @@ function loadSocket(){
 socket = io("https://mmorpg-2if7.onrender.com");
 //https://mmorpg-2if7.onrender.com
 
-
-
-
-
-
-
 // When connected
 socket.on("connect", () => {
  myId = socket.id;

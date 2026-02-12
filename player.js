@@ -36,6 +36,13 @@ class Player{
    this.count = 0;
  }
  work() {
+  if(dist(this.x,this.y,width/2,height/2)>worldBorder-this.radius){
+    let vect = createVector(this.x-width/2,this.y-height/2);
+    vect.normalize();
+    vect.mult(worldBorder-this.radius);
+    this.x=width/2+vect.x;
+    this.y=height/2+vect.y;
+   }
    // this.gunType="jumper"
    if(frameCounts%(60*(gunData[this.gunType].regen-0.5))==0&&this.ammo<6){
       this.ammo+=1;

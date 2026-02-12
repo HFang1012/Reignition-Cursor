@@ -94,7 +94,7 @@ class Bullet{
   }
 damage(id, damage=1, coloring = 255, x=0, y=0){
    this.kill()
-  if(dist(this.x,this.y,width/2,height/2)>safeRadius+10){
+  if(dist(this.x,this.y,width/2,height/2)>safeRadius+10||!enables.spawn){
   if(myId==this.playerId){
     
        socket.emit("removeBullet", {id: this.id, pId: id, type: this.type, damage: damage});
