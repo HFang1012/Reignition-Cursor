@@ -196,17 +196,27 @@ class WorldObject{
     pg.beginShape();
     pg.strokeWeight(10);
     pg.noFill();
-    pg.stroke(255);
-    pg.fill(20)
+    pg.stroke(255,100);
+    pg.fill(255,100)
     if(this.marked){
       pg.fill(255,0,0,100)
     }
+    pg.stroke(255,100);
+    pg.fill(255,100)
     let sides = floor(this.radius/12);
+    let dists = min(dist(player.x,player.y,this.x,this.y)/60,20)*0;
+    let ang = atan2(player.y-this.y ,player.x-this.x);
+    for(let i=0; i<sides; i++){
+    pg.vertex(cos(360/sides*i)*(this.radius*1.05)-cos(ang)*dists,sin(360/sides*i)*(this.radius*1.05)-sin(ang)*dists);
+    }
+    pg.endShape(CLOSE);
+    pg.beginShape();
+    pg.fill(20)
+    pg.stroke(255);
     for(let i=0; i<sides; i++){
       pg.vertex(cos(360/sides*i)*this.radius,sin(360/sides*i)*this.radius);
     }
     pg.endShape(CLOSE);
-    
     pg.pop();
     }
       

@@ -163,8 +163,14 @@ pg.noFill();
  for(let i=0; i<30; i++){
    pg.arc(width/2,height/2,radius*2,radius*2,i*360/30,(i+0.4)*360/30);
  }
-   pg.pop();
+ if(dist(player.x,player.y,width/2,height/2)<=50+radius){
+           if(player.maxHealth-player.health>0){
+     hitParticleQueue[hitParticleQueue.length] = {id: myId, damage: `+${player.maxHealth-player.health}`, coloring: "rgb(150,255,200)"};
   }
+    player.health=player.maxHealth;
+    }
+   pg.pop();
+  } 
  for(let i=particles.length-1; i>=0; i--){
    if(particles[i].layer==0){
    particles[i].work();
