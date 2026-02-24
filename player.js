@@ -12,13 +12,13 @@ class Player{
    this.health = 7;
    this.maxHealth = 7;
    this.id = myId;
-   this.gunType = guns[floor(random(0,guns.length))];
+   this.gunType = guns[0];
   this.gunType="jumper"
   // this.gunType="homin
    this.direction = {x: 0, y: 0};
    this.directionTween = {x:0,y:0};
-   this.face = faces[floor(random(0,faces.length))]
-   this.coloring =colors[floor(random(0,colors.length))]
+   this.face = faces[0]
+   this.coloring =colors[0]
    this.pointingA=0;
        if(!this.coloring){
       this.coloring="rgb(0,0,0)";

@@ -101,7 +101,7 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
 }
 
   if(id==myId){ 
-    if(!damagedBulletIds.includes(this.damageId)&&this.coloring!=player.coloring){
+    if(!damagedBulletIds.includes(this.damageId)&&(this.coloring!=player.coloring||!enables.teams)){
       player.health-=damage;
           }
     x = player.x;
@@ -109,7 +109,7 @@ damage(id, damage=1, coloring = 255, x=0, y=0){
     coloring = player.coloring
   }
  // print(this.coloring,players[this.playerId]?.coloring,player.coloring)
-  if(!damagedBulletIds.includes(this.damageId)&&((this.playerId==myId) ? (this.coloring!=players[id]?.coloring) : (this.coloring!=player.coloring))){
+  if(!damagedBulletIds.includes(this.damageId)&&((this.playerId==myId) ? (this.coloring!=players[id]?.coloring||!enables.teams) : (this.coloring!=player.coloring||!enables.teams))){
   hitParticleQueue[hitParticleQueue.length] = {id: id, damage: 0-damage, coloring: 255};
   }else{
     hitParticleQueue[hitParticleQueue.length] = {id: id, damage: 0, coloring: 255};

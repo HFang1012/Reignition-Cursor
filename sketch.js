@@ -44,7 +44,7 @@ function setup(){
  print(myIP)
  let canvas = createCanvas(1280, 720, WEBGL);
  canvas.style('cursor', 'none');
- canvas.position(-width / 2, 0);
+ //canvas.position(-width / 2, 0);
  pg = createGraphics(width, height);
  angleMode(DEGREES);
  rectMode(CENTER);
@@ -87,6 +87,7 @@ changeObjects = [];
   }
 }
 enables.spawn = gamemode!="royale";
+enables.teams = gamemode!="royale";
  player.id = myId;
  if(frameCounts%5==0){
    socket.emit("getRooms", {room: room});
@@ -130,10 +131,10 @@ enables.spawn = gamemode!="royale";
  mouseProg.tweenVel/=1.4;
  mouseProg.dir+=(abs(mouseProg.dir)/mouseProg.dir-mouseProg.dir)/10;
  preMouse = {...mouse};
- mouse = createVector(((mouseX*2-width-(-cameras.x+width/2))-cameras.x)/zoom+cameras.x,(mouseY*2-(-cameras.y+height/2)-cameras.y)/zoom+cameras.y);
- if(screen==0){
-   mouse = createVector(((mouseX*2-width-(-cameras.x+width/2))),(mouseY*2-(-cameras.y+height/2)));
- }
+ mouse = createVector(((mouseX-(-cameras.x+width/2))-cameras.x)/zoom+cameras.x,(mouseY-(-cameras.y+height/2)-cameras.y)/zoom+cameras.y);
+  if(screen==0){
+    mouse = createVector(((mouseX-(-cameras.x+width/2))),(mouseY-(-cameras.y+height/2)));
+  }
  pg.background(20,210);
  if(screen>0){
  pg.translate(-cameras.x+width/2,-cameras.y+height/2)
@@ -402,15 +403,18 @@ for(let i=chatMessages.length-1; i>=0; i--){
  selectionPage()
  mouseSprite(mouse.x,mouse.y,255,mouseProg,6,'common');
 }
-
+//print(selectionPage)
 
  //mouseSprite(mouse.x,mouse.y,"rgb(150,250,255)");
  //SHADER ITEMS
+ /*
  shader(pixelShader);
  pixelShader.setUniform("tex0", pg);
  pixelShader.setUniform("resolution", [width, height]);
  pixelShader.setUniform("pixelSize", 1);
  rect(0, 0, width, height);
+ */
+image(pg, -width / 2, -height / 2);
  if(frameCount%1==0){
     sendPlayerUpdate();
    sendUpdate();
@@ -879,6 +883,38 @@ function mousePressed(){
  mouseProg.dir*=-4;
  mouseProg.dir=constrain(mouseProg.dir,-11,11);
  shake=2
+ //ROYALE MODE
+ if (rectHit(brx,500,mouse.x,mouse.y,200,70,5,5)&&screen==0&&lobbyType){
+   if (usernameText){
+   let code = "NONE";
+   let highestRoom = {name: "NONE",players:0};
+   // rooms[roomData.name] = { players: {}, blocks: {},
+   // type: roomData?.type ?? "custom",started: false, startingPlayers: {}};
+    for(let keyR in availableRooms){
+       if(availableRooms[keyR].type=="royale"){
+          highestRoom = {name: keyR, players: Object.keys(availableRooms[keyR].players).length};
+       }
+    }
+    if(highestRoom?.name=="NONE"){
+      code = generateCode();
+      createRoom({name: code, type: "royale"});
+    }else{
+      code = highestRoom.name;
+    }
+    joinRoom(code)
+    gamemode = "royale";
+    player.coloring = colors[floor(random(0,colors.length))]
+   room = code;
+   copyStringToClipboard(code)
+   user=usernameText
+   player.displayName=usernameText
+     setNoiseSeed();
+    
+   }else{
+     roomError(0)
+   }
+   // currentRoom = true
+ }
  if (rectHit(rx,500,mouse.x,mouse.y,500,70,5,5)&&screen==0){
    lobbyType = true
    lobbyTyper=true;
@@ -894,38 +930,12 @@ function mousePressed(){
    lobbyType = false
    lobbyTyper=false;
    hanger = true
+   selectedItem = { ...faces }
+      for (let i in selectedItem) {
+        selectedItemButton[i] = { targetBig: 120, targetSmall: 100, current: 100, target: 100 }
+      }
  }
- //royale
- if (rectHit(brx,500,mouse.x,mouse.y,200,70,5,5)&&screen==0){
-   if (usernameText){
-   let code = "NONE";
-   let highestRoom = {name: "NONE",players:0};
-   // rooms[roomData.name] = { players: {}, blocks: {},
-   // type: roomData?.type ?? "custom",started: false, startingPlayers: {}};
-    for(let keyR in availableRooms){
-       if(availableRooms[keyR].type=="royale"){
-          highestRoom = {name: keyR, players: Object.keys(availableRooms[keyR].players).length};
-       }
-    }
-    if(highestRoom?.name=="NONE"){
-      createRoom({name: code, type: "royale"});
-      code = generateCode();
-    }else{
-      code = highestRoom.name;
-    }
-    joinRoom(code)
-    gamemode = "royale";
-   room = code;
-   copyStringToClipboard(code)
-   user=usernameText
-   player.displayName=usernameText
-     setNoiseSeed();
-    
-   }else{
-     roomError(0)
-   }
-   // currentRoom = true
- }
+ 
  if (rectHit(rx4,600,mouse.x,mouse.y,400,70,5,5)&&screen==0){
    usernameType = true
   if(lobbyCode==""){
