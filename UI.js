@@ -122,9 +122,9 @@ function selectionPage() {
   pg.noFill()
   pg.stroke(colors[0])
   pg.translate(1280 / 2 - 220, 600)
-  pg.scale(ht, ht)
+  pg.scale(hs, hs)
   pg.rect(0,0, 70, 70, 15)
-  pg.scale(1/ht,1/ht)
+  pg.scale(1/hs,1/hs)
   pg.translate(-(1280 / 2 - 220), -600)
   pg.translate(1280 / 2 - 220, 604)
   pg.scale(hs,hs)
@@ -224,7 +224,9 @@ function selectionPage() {
       
       let current = selectedItemButton[Object.keys(selectedItem)[i]]?.current
       pg.rect(x, y, current, current, 15);
+      //TS IS NOT PROGRESS
       if (tab == 0) {
+
         facesPage(Object.values(selectedItem)[i], x, y);
         if (rectHit(x, y, mouse.x, mouse.y, 100, 100, 5, 5)) {
           if (mouseIsPressed && mouseAvailable) {
@@ -234,12 +236,14 @@ function selectionPage() {
           }
 
           selectedItemButton[Object.keys(selectedItem)[i]].target = 120
-
+          selectedItemButton[Object.keys(selectedItem)[i]].sclT = 1.2
 
         } else {
+          selectedItemButton[Object.keys(selectedItem)[i]].sclT = 1
           selectedItemButton[Object.keys(selectedItem)[i]].target = 100
         }
         selectedItemButton[Object.keys(selectedItem)[i]].current -= (current - selectedItemButton[Object.keys(selectedItem)[i]].target) / 5
+        selectedItemButton[Object.keys(selectedItem)[i]].scl -= (selectedItemButton[Object.keys(selectedItem)[i]].scl - selectedItemButton[Object.keys(selectedItem)[i]].sclT) / 5
       }
 
     }
@@ -247,7 +251,7 @@ function selectionPage() {
       mouseAvailable = false;
       selectedItem = { ...faces }
       for (let i in selectedItem) {
-        selectedItemButton[i] = { targetBig: 120, targetSmall: 100, current: 100, target: 100 }
+        selectedItemButton[i] = { targetBig: 120, targetSmall: 100, current: 100, target: 100 , sclT: 1, scl: 1}
       }
       t =selectedItemButton[Object.keys(selectedItem)[i]]?.target
       tab = 0;

@@ -183,9 +183,10 @@ if(this.canMove){
   }
      for(let block of blocks){
       let distance = dist(block.x,block.y,this.x,this.y);
+      //HANSON MY CHANGES DONT WORK
       if(distance<=this.size/2+block.radius){
         if(this.type!="bounce"&&this.type!="jumper"||this.bounces<=0&&this.type!="jumper"){
-          if (this.type == "phase"&&this.alive){
+          if (this.type == "phase"&&this.alive&&this.playerId==myId){
             this.alive= false;
             let c = createVector(this.x-block.x,this.y-block.y);
             c.normalize();
@@ -206,7 +207,7 @@ if(this.canMove){
     let d = dist(0,0,this.xvel,this.yvel);
     let s1 = cos(angle)*d;
     let s2 = sin(angle)*d;
-    let bulletData = {x:block.x+c.x+v.x,y: block.y+c.y+v.y,xvel: s1,yvel: s2,type:  "range",id:this.playerId,coloring: this.coloring,bId: generateCode(),gained: 0,damageId: dmgId,shotId: shotId};
+    let bulletData = {x:block.x+c.x+v.x,y: block.y+c.y+v.y,xvel: s1,yvel: s2,type:  "range",id:this.playerId,coloring: this.coloring,bId: generateCode(),gained: 1,damageId: dmgId,shotId: shotId};
      bullets[bullets.length]=new Bullet(bulletData.x,bulletData.y,bulletData.xvel,bulletData.yvel,bulletData.type,this.playerId,this.coloring,bulletData.dmgId);
     bullets[bullets.length-1].isMain = false;
     //recoil
