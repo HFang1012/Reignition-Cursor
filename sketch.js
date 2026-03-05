@@ -73,9 +73,15 @@ var cameras = {x:640/2,y:360/2};
 var frameCounts = 0;
 var zoom = 0.6;
 var safeRadius = 600;
-var worldBorder = 3000;
+var worldBorder = 5000;
 function CustomDraw(){
-  if(screen>0){
+  if(gamemode=="royale"){
+    socket.emit("fetchTick", {});
+    if(royaleData?.tickData?.borderRadius){
+    worldBorder +=(royaleData?.tickData?.borderRadius-worldBorder)/120;
+    }
+  }
+  if(screen==1){
   if(enables.spawn&&changeObjects.length<=0){
 changeObjects[changeObjects.length] = new WorldObject(width/2,height/2-safeRadius+130,80,"Gun","static");
   changeObjects[changeObjects.length] = new WorldObject(width/2,height/2+safeRadius-130,80,"Player","static");
@@ -94,10 +100,10 @@ enables.teams = gamemode!="royale";
   // console.log(availableRooms);
  }
  //print(cursors)
- if(screen>0){
+ if(screen==1){
    playingTime++;
  }
- if(keyIsDown(86)&&!typing&&screen>0){
+ if(keyIsDown(86)&&!typing&&screen==1){
   zoom+=((0.1)-zoom)/5
  }else{
  //zoom+=((gunData[player.gunType].zoom ?? 1)-zoom)/10
@@ -136,7 +142,7 @@ enables.teams = gamemode!="royale";
     mouse = createVector(((mouseX-(-cameras.x+width/2))),(mouseY-(-cameras.y+height/2)));
   }
  pg.background(20,210);
- if(screen>0){
+ if(screen==1){
  pg.translate(-cameras.x+width/2,-cameras.y+height/2)
  pg.translate(random(-shake,shake),random(-shake,shake))
  pg.translate(cameras.x,cameras.y)
@@ -398,10 +404,38 @@ for(let i=chatMessages.length-1; i>=0; i--){
  pg.pop();
  chatIter++;
 }
-}else{
+}else if(screen==0){
  //start pages _______--___-------
  selectionPage()
  mouseSprite(mouse.x,mouse.y,255,mouseProg,6,'common');
+}else if(screen==3){
+  pg.background(20);
+  pg.push();
+  pg.textSize(100);
+  pg.fill(255);
+  pg.stroke(255);
+  pg.strokeWeight(2);
+  pg.translate(width/2,150)
+  pg.textAlign(CENTER,CENTER);
+  if(royaleData?.tickData?.untilStart){
+    if(royaleData?.tickData?.untilStart<=0){
+      screen = 1;
+      let startingPlayers = Object.keys(royaleData?.tickData?.startingPlayers);
+      if(startingPlayers.indexOf(myId)!=-1){
+      let ang = 360/(startingPlayers.length)*startingPlayers.indexOf(myId);
+      
+      //print(cos(ang)*(royaleData?.tickData?.borderRadius-500))
+      player.x=width/2+cos(ang)*(royaleData?.tickData?.borderRadius-500);
+      player.y=height/2+sin(ang)*(royaleData?.tickData?.borderRadius-500);
+      }
+    }
+  pg.text(`Starting: ${royaleData?.tickData?.untilStart/1000}s!`,0,0);
+  }else{
+    pg.text(`Fetching Data...`,0,0);
+  }
+  pg.pop();
+mouseSprite(mouse.x,mouse.y,255,mouseProg,6,'snipe');
+
 }
 //print(selectionPage)
 
@@ -468,7 +502,7 @@ function keyPressed(){
  }
        }
 }
- if(key==" "&&screen>0&&!typing){
+ if(key==" "&&screen==1&&!typing){
    attemptShoot();
  }
  if(typing){
@@ -666,7 +700,7 @@ function keyPressed(){
       }
    player.chatText = currentMessage;
  }
-   if(keyIsDown(13)&&screen>0){
+   if(keyIsDown(13)&&(screen==1)){
    typing=!typing;
  }
  if(screen ==0&&lobbyType){
@@ -723,7 +757,7 @@ window.addEventListener("paste", (e) => {
 // console.log("Pasted:", pastedText);
 });
 function attemptShoot(){
-   if(player.ammo>0&&screen>0&&player.healthImpact<=0.001){
+   if(player.ammo>0&&screen==1&&player.healthImpact<=0.001){
       if(dist(player.x,player.y,width/2,height/2)>50+safeRadius){
       player.ammo-=1;
       }
@@ -845,7 +879,7 @@ function attemptShoot(){
  }else{
     shake = 15
  }
- if(screen>0&&player.healthImpact<=0.001){
+ if(screen==1&&player.healthImpact<=0.001){
  if(dist(player.x,player.y,width/2,height/2)<=50+safeRadius){
    player.healthImpact+=0.5;
  }else{
@@ -857,7 +891,9 @@ function mouseReleased(){
  mouseProg.tweenVel+=5;
  mouseProg.dir*=1.3;
  mouseProg.dir=constrain(mouseProg.dir,-11,11);
+ if(screen==1){
  attemptShoot();
+ }
 }
 var errorTimer = 0
 var errorType
@@ -909,7 +945,7 @@ function mousePressed(){
    user=usernameText
    player.displayName=usernameText
      setNoiseSeed();
-    
+    screen = 3;
    }else{
      roomError(0)
    }

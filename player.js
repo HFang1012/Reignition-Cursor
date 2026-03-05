@@ -13,7 +13,7 @@ class Player{
    this.maxHealth = 7;
    this.id = myId;
    this.gunType = guns[0];
-  this.gunType="jumper"
+  this.gunType="common"
   // this.gunType="homin
    this.direction = {x: 0, y: 0};
    this.directionTween = {x:0,y:0};

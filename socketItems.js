@@ -57,8 +57,10 @@ function loadChunk(x,y){
  }
 }
 var availableRooms = {};
+var royaleData={};
 function loadSocket(){
-socket = io("https://mmorpg-2if7.onrender.com");
+socket = io("http://localhost:3000");
+//https://mmorpg-2if7.onrender.com
 //https://mmorpg-2if7.onrender.com
 
 // When connected
@@ -81,7 +83,7 @@ socket.on("rooms_list", (rooms) => {
  socket.on("initialState", (data) => {
  //cursors = { ...data};
  console.log("Joined room. Initial players:", `${Object.keys(cursors).length}`);
- currentRoom = true; // flag you are in a room
+ //currentRoom = true; // flag you are in a room
 });
 
 
@@ -123,6 +125,12 @@ socket.on("removePlayer", (id) => {
  delete cursors[id];
  delete players[id];
 });
+ socket.on("tickData", (data) => {
+  //print("FETCHED")
+  if(data.id==myId){
+  royaleData = data;
+}
+})
 //availableRooms
  socket.on("gotRooms", (data) => {
   //console.log(2)
@@ -221,7 +229,7 @@ function sendPlayerUpdate() {
    directionTween: player.directionTween,
    direction: player.direction,
    coloring: player.coloring,
-   cRoom: currentRoom,
+   cRoom: room,
    username: user,
    chatText: player.chatText,
    health: player.health,
@@ -243,7 +251,7 @@ function sendUpdate() {
  const myData = {
    x: mouse.x,
    y: mouse.y,
-   cRoom: currentRoom,
+   cRoom: room,
    mouseProg: mouseProg,
    ammo: player.ammo,
    gunType: player.gunType,
