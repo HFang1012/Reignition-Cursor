@@ -226,8 +226,11 @@ function selectionPage() {
       pg.rect(x, y, current, current, 15);
       //TS IS NOT PROGRESS
       if (tab == 0) {
-
-        facesPage(Object.values(selectedItem)[i], x, y);
+        pg.translate(x,y);
+        pg.scale(selectedItemButton[Object.keys(selectedItem)[i]]?.scl)
+        facesPage(Object.values(selectedItem)[i], 0,0);
+        pg.scale(1/selectedItemButton[Object.keys(selectedItem)[i]]?.scl)
+        pg.translate(-x,-y);
         if (rectHit(x, y, mouse.x, mouse.y, 100, 100, 5, 5)) {
           if (mouseIsPressed && mouseAvailable) {
             mouseAvailable = false;
@@ -260,7 +263,7 @@ function selectionPage() {
       mouseAvailable = false;
       selectedItem = { ...crosshairs }
       for (let i in selectedItem) {
-        selectedItemButton[i] = { targetBig: 120, targetSmall: 100, current: 100, target: 100 }
+        selectedItemButton[i] = { targetBig: 120, targetSmall: 100, current: 100, target: 100 , sclT: 1, scl: 1}
       }
       t =selectedItemButton[Object.keys(selectedItem)[i]]?.target
       tab = 2;
@@ -269,7 +272,7 @@ function selectionPage() {
       mouseAvailable = false;
       selectedItem = { ...playerGuns }
       for (let i in selectedItem) {
-        selectedItemButton[i] = { targetBig: 120, targetSmall: 100, current: 100, target: 100 }
+        selectedItemButton[i] = { targetBig: 120, targetSmall: 100, current: 100, target: 100 , sclT: 1, scl: 1}
       }
       t =selectedItemButton[Object.keys(selectedItem)[i]]?.target
       tab = 1;
@@ -372,9 +375,10 @@ function generateCode() {
 
 }
 
-function facesPage(type, x, y) {
+function facesPage(type, x, y, s) {
   pg.push();
   pg.translate(x, y);
+  pg
   pg.fill(colors[0]);
   pg.strokeWeight(1);
   pg.textAlign(CENTER, CENTER);
