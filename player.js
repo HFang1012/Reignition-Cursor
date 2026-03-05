@@ -24,6 +24,7 @@ class Player{
       this.coloring="rgb(0,0,0)";
       }
    this.displayName = user
+   this.gamemode = "spectator";
    this.chatText = "";
    this.radius = 50;
    this.kbxvel = 0;
@@ -121,6 +122,9 @@ class Player{
       this.coloring="rgb(0,0,0)";
       }
    pg.stroke(this.coloring);
+   if(this.gamemode =="spectator"){
+          pg.stroke(`rgba(${this.coloring.slice(4,this.coloring.length-1)},0.6)`);
+   }
    pg.noFill();
    pg.fill(20)
    pg.beginShape();
@@ -138,6 +142,9 @@ class Player{
    // ["scared","happy","evil","dead"];
    pg.endShape(CLOSE);
    pg.fill(this.coloring);
+   if(this.gamemode =="spectator"){
+          pg.stroke(`rgba(${this.coloring.slice(4,this.coloring.length-1)},0.6)`);
+   }
    pg.strokeWeight(1);
    pg.textAlign(CENTER,CENTER);
    pg.textSize(100)
