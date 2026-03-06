@@ -89,6 +89,10 @@ class Player{
    this.yvel/=10;
    this.x+=this.xvel+this.kbxvel;
    this.y+=this.yvel+this.kbyvel;
+   if(this.gamemode == "spectator"){
+    this.x+=this.xvel*1.5+this.kbxvel;
+   this.y+=this.yvel*1.5+this.kbyvel;
+   }else{
    for(let block of blocks){
      let distance = dist(block.x,block.y,this.x,this.y);
      if(distance<=this.radius+block.radius){
@@ -99,6 +103,7 @@ class Player{
        this.y=block.y+vect.y;
      }
    }
+  }
    this.directionTween.x-=(this.directionTween.x-this.direction.x)/5;
    this.directionTween.y-=(this.directionTween.y+this.direction.y)/5;
     this.pointingA = (atan2(mouse.y-this.y,mouse.x-this.x)+90);
@@ -230,11 +235,11 @@ class Player{
   
    pg.push();
    pg.translate(this.x,this.y);
-   let angle = atan2(mouse.y-this.y,mouse.x-this.x)
+   let angle = atan2(mouse.y-this.y,mouse.x-this.x);
    if(myId!=this.id&&cursors[this.id]?.x&&cursors[this.id]?.y){
-     angle = atan2(cursors[this.id].y-this.y,cursors[this.id].x-this.x)
+     angle = atan2(cursors[this.id].y-this.y,cursors[this.id].x-this.x);
    }
-   this.healthAngle=angle
+   this.healthAngle=angle;
    pg.noFill();
 
 
@@ -251,8 +256,8 @@ class Player{
    pg.rotate(-angleChange/2);
    for(let i=0; i<this.health; i++){
      let addon = 70+this.healthImpact*2+abs(i-this.health/2)*1;
-     pg.line(-5,addon,0,addon+5)
-     pg.line(5,addon,0,addon+5)
+     pg.line(-5,addon,0,addon+5);
+     pg.line(5,addon,0,addon+5);
      pg.rotate(-angleChange);
    }
    pg.pop();

@@ -59,7 +59,7 @@ function loadChunk(x,y){
 var availableRooms = {};
 var royaleData={};
 function loadSocket(){
-socket = io("http://localhost:3000");
+socket = io("https://mmorpg-2if7.onrender.com");
 //https://mmorpg-2if7.onrender.com
 //https://mmorpg-2if7.onrender.com
 

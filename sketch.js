@@ -4,10 +4,10 @@ var gunData = {"common": {zoom: 0.6, reload: 1.55,recoil: 0.5,display: "Common",
 let guns = Object.keys(gunData);
 var colors = ['rgb(141,236,243)','rgb(246,161,161)','rgb(241,221,135)','rgb(155,243,168)','rgb(141,176,244)','rgb(237,161,248)'];
 var faces = ["scared","happy","evil","dead","shocked","sad","bruh","money","derp","ah"];
-var user ="";
+var user = "";
 var crosshairs = ["cross","circle",""];
 var playerGuns = ["basic","arrow","fork","silencer"];
-var shake = 0
+var shake = 0;;
 var bullets = [];
 var emptySound;
 var player;
@@ -50,7 +50,7 @@ function setup(){
  rectMode(CENTER);
  pg.angleMode(DEGREES);
  pg.rectMode(CENTER);
- pg.textFont('itim')
+ pg.textFont('itim');
  mouse = createVector(0, 0);
  pixelShader.setUniform("tex0", pg);
  pg.noSmooth();
@@ -104,10 +104,13 @@ enables.teams = gamemode!="royale";
    playingTime++;
  }
  if(keyIsDown(86)&&!typing&&screen==1){
-  zoom+=((0.1)-zoom)/5
+  zoom+=((0.1)-zoom)/5;
  }else{
  //zoom+=((gunData[player.gunType].zoom ?? 1)-zoom)/10
  zoom+=((gunData[player.gunType]?.zoom ?? 1)-zoom)/10;
+  }
+  if(player.gamemode == "spectator"){
+    zoom=0.3
   }
  canvas.style.cursor = 'none';
 // print(blocks.length)
@@ -117,7 +120,7 @@ enables.teams = gamemode!="royale";
  frameCounts++;
  cameras.x+=(player.x-cameras.x)/10;
  cameras.y+=(player.y-cameras.y)/10;
- pg.resetMatrix()
+ pg.resetMatrix();
  //pg.clear();
 // print(cameras.x-width/2,cameras.y-height/2)
  //pg.translate(cameras.x-width/2,cameras.y-height/2)
@@ -143,12 +146,12 @@ enables.teams = gamemode!="royale";
   }
  pg.background(20,210);
  if(screen==1){
- pg.translate(-cameras.x+width/2,-cameras.y+height/2)
- pg.translate(random(-shake,shake),random(-shake,shake))
- pg.translate(cameras.x,cameras.y)
- pg.scale(zoom,zoom)
- pg.translate(-cameras.x,-cameras.y)
- shake/=2.5
+ pg.translate(-cameras.x+width/2,-cameras.y+height/2);
+ pg.translate(random(-shake,shake),random(-shake,shake));
+ pg.translate(cameras.x,cameras.y);
+ pg.scale(zoom,zoom);
+ pg.translate(-cameras.x,-cameras.y);
+ shake/=2.5;
  //worldBorder
  if(true){
   pg.push();
@@ -333,7 +336,7 @@ let tintV = min((1- dist(player.x,player.y,width/2,height/2) /(200+safeRadius)) 
      let item = cursors[i];
      if(item?.mouseProg){
         if(!item.coloring){
-        item.coloring = "rgb(0,0,0)"
+        item.coloring = "rgb(0,0,0)";
      }
      mouseSprite(item.x,item.y,item.coloring,item.mouseProg,item.ammo,item.gunType);
    }
@@ -378,7 +381,7 @@ pg.textSize(50);
 pg.noStroke();
 pg.strokeWeight(1);
 pg.stroke(255,350-min(chatTransTween,150));
-fpsTrack[fpsTrack.length]=frameRate()/60*100
+fpsTrack[fpsTrack.length]=frameRate()/60*100;
 pg.text(`FPS: ${floor(fpsTrack[(fpsTrack.length-1)-(fpsTrack.length-1)%5]*60)/100}\nLast Server Update: ${framesSince}\nLobby Code: ${room}\nDetected Players: ${Object.keys(players).length+1}\nParticles: ${particles.length}, Blocks: ${blocks.length}, Bullets: ${bullets.length}`,20,50);
 let iter = 0;
 pg.strokeWeight(4);
@@ -409,15 +412,17 @@ for(let i=chatMessages.length-1; i>=0; i--){
  selectionPage()
  mouseSprite(mouse.x,mouse.y,255,mouseProg,6,'common');
 }else if(screen==3){
+  //loading into battle royale screen :P lel
   pg.background(20);
   pg.push();
-  pg.textSize(100);
+  pg.textSize(75);
   pg.fill(255);
   pg.stroke(255);
   pg.strokeWeight(2);
   pg.translate(width/2,150)
   pg.textAlign(CENTER,CENTER);
-  if(royaleData?.tickData?.untilStart){
+
+  if(royaleData?.tickData?.untilStart&&royaleData?.tickData?.untilStart!=10000){
     if(royaleData?.tickData?.untilStart<=0){
       screen = 1;
       let startingPlayers = Object.keys(royaleData?.tickData?.startingPlayers);
@@ -431,9 +436,26 @@ for(let i=chatMessages.length-1; i>=0; i--){
     }
   pg.text(`Starting: ${royaleData?.tickData?.untilStart/1000}s!`,0,0);
   }else{
-    pg.text(`Fetching Data...`,0,0);
+    pg.text(`Not Enough Players`,0,0);
   }
   pg.pop();
+  pg.push();
+  pg.fill(255);
+  pg.stroke(255);
+  pg.strokeWeight(2);
+  pg.textAlign(CENTER,CENTER);
+  pg.textSize(50);
+  for (let i =0; i<Object.keys(players).length; i++){
+    pg.fill(players[Object.keys(players)[i]].coloring);
+    pg.stroke(players[Object.keys(players)[i]].coloring);
+    pg.text(players[Object.keys(players)[i]].username, width/2, 300+i*50);
+  }
+  pg.textSize(60);
+  pg.fill(player.coloring);
+    pg.stroke(player.coloring);
+  pg.text(`Your Username: ${player.displayName}`, width/2, height*0.8);
+  pg.pop();
+  //sd
 mouseSprite(mouse.x,mouse.y,255,mouseProg,6,'snipe');
 
 }
@@ -757,7 +779,8 @@ window.addEventListener("paste", (e) => {
 // console.log("Pasted:", pastedText);
 });
 function attemptShoot(){
-   if(player.ammo>0&&screen==1&&player.healthImpact<=0.001){
+
+   if(player.ammo>0&&screen==1&&player.healthImpact<=0.001&&player.gamemode=="survival"){
       if(dist(player.x,player.y,width/2,height/2)>50+safeRadius){
       player.ammo-=1;
       }
@@ -876,16 +899,19 @@ function attemptShoot(){
      player.kbxvel-=bulletVE.x*gunData[player.gunType].recoil;
    player.kbyvel-=bulletVE.y*gunData[player.gunType].recoil;
     shake = 8
- }else{
-    shake = 15
- }
- if(screen==1&&player.healthImpact<=0.001){
+     if(screen==1&&player.healthImpact<=0.001){
  if(dist(player.x,player.y,width/2,height/2)<=50+safeRadius){
    player.healthImpact+=0.5;
  }else{
     player.healthImpact+=15;
  }
  }
+ }else{
+    shake = 15
+ }
+  if(player.ammo>0&&screen==1&&player.healthImpact<=0.001&&player.gamemode=="spectator"){
+shake+=40;
+  }
 }
 function mouseReleased(){
  mouseProg.tweenVel+=5;
@@ -946,6 +972,8 @@ function mousePressed(){
    player.displayName=usernameText
      setNoiseSeed();
     screen = 3;
+    
+    // player = new Player(player.displayName,player.face,player.coloring,player.gunType);
    }else{
      roomError(0)
    }
