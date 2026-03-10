@@ -268,7 +268,10 @@ for(let i of Object.keys(players)){
      chosen.healthAngle = item.healthAngle;
      chosen.id = item.id;
       chosen.ip = item.ip;
+      chosen.gamemode = item.gamemode;
+      if(item?.gamemode!="spectator"){
        chosen.display();
+      }
      let angle = atan2(chosen.y-cameras.y,chosen.x-cameras.x)+90;
      pg.push();
      pg.resetMatrix();
@@ -338,7 +341,9 @@ let tintV = min((1- dist(player.x,player.y,width/2,height/2) /(200+safeRadius)) 
         if(!item.coloring){
         item.coloring = "rgb(0,0,0)";
      }
+     if(item?.gamemode!="spectator"){
      mouseSprite(item.x,item.y,item.coloring,item.mouseProg,item.ammo,item.gunType);
+     }
    }
    }
  }

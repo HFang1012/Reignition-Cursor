@@ -215,6 +215,7 @@ function joinRoom(roomName) {
  currentRoom = roomName
  room = roomName;
  screen = 1
+ player.gamemode = "survival";
 }
 function sendPlayerUpdate() {
  if(room=="NO ROOM") return;
@@ -236,7 +237,8 @@ function sendPlayerUpdate() {
    healthImpact: player.healthImpact,
    healthAngle: player.healthAngle,
    id: myId,
-   ip: myIP
+   ip: myIP,
+   gamemode: player.gamemode
  };
  player[myId] = myData;
  socket.emit("updateData", myData); // client NEVER uses .to()
@@ -256,6 +258,7 @@ function sendUpdate() {
    ammo: player.ammo,
    gunType: player.gunType,
    coloring: player.coloring,
+   gamemode: player.gamemode
  };
  //cursors[myId] = myData;
  socket.emit("updateCursor", myData); // client NEVER uses .to()

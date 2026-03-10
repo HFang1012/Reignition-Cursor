@@ -24,7 +24,7 @@ class Player{
       this.coloring="rgb(0,0,0)";
       }
    this.displayName = user
-   this.gamemode = "spectator";
+   this.gamemode = "survival";
    this.chatText = "";
    this.radius = 50;
    this.kbxvel = 0;
@@ -58,6 +58,7 @@ class Player{
      this.x=this.spawnPos.x
      this.y = this.spawnPos.y
      this.health = 7;
+     this.gamemode = "spectator";
    }
    this.healthImpact/=gunData[this.gunType].reload ?? 1.4;
    if(this.healthImpact<=0.001){
