@@ -244,7 +244,7 @@ function sendPlayerUpdate() {
 // sending your own updates
 function sendUpdate() {
  if(room=="NO ROOM") return;
- if (!myId) return;
+ if (!myId) return; 
  if (!currentRoom) return; // do NOT send updates from lobby
 
 
