@@ -41,12 +41,12 @@ function loadChunk(x,y){
            }
          }
          if(noiseValue>0.72&&canPlace&&dist(640, 360,x+i,y+c)>safeRadius+noiseSize){
-           addedBlocks[addedBlocks.length] = new WorldObject(x+i,y+c,noiseSize,"Block",chunkKey)
+           addedBlocks[addedBlocks.length] = new WorldObject(x+i,y+c,noiseSize,(random(0,100)<92) ? "Block" : "Station",chunkKey)
          }
        }
      }
      for(let block of addedBlocks){
-       blocks[blocks.length] =new WorldObject(block.x,block.y,block.radius,"Block",block.chunkKey)
+       blocks[blocks.length] =new WorldObject(block.x,block.y,block.radius,block.type,block.chunkKey)
      }
      chunkData[chunkKey] = {blocks: addedBlocks};
    }
@@ -151,7 +151,7 @@ socket.on("update", (data) => {
    cursors [data.id] = {x: data.cursorData.x, y: data.cursorData.y,mouseProg: data.cursorData.mouseProg,
    ammo: data.cursorData.ammo,
    gunType: data.cursorData.gunType,
-                      coloring: data.cursorData.coloring};
+                      coloring: data.cursorData.coloring, gamemode: data.cursorData.gamemode};
    cursors[data.id].cRoom = {currentRoom};
 }
 });

@@ -19,6 +19,57 @@ class WorldObject{
     this.player.falsePlayer = true;
   }
     display(){
+       if(this.type=="Station"){
+        this.radius+=this.sizeVel;
+        this.sizeVel/=1.2;
+        this.sizeVel+=(this.baseRadius-this.radius)/10;
+        let chosenGun = guns[this.gunStage%guns.length];
+        
+    pg.push();
+    pg.translate(this.x,this.y);
+         pg.rotate(-frameCounts*0.5)
+    pg.beginShape();
+    pg.strokeWeight(10);
+    pg.noFill();
+    pg.stroke(player?.coloring);
+    pg.fill(20)
+    let sides = 9;
+    for(let i=0; i<sides; i++){
+      pg.vertex(cos(360/sides*i)*this.radius,sin(360/sides*i)*this.radius);
+    }
+    //pg.text();
+    pg.endShape(CLOSE);
+    
+    pg.pop();
+        pg.push();
+        pg.translate(this.x,this.y);
+        pg.strokeWeight(2);
+        pg.textSize(50);
+        pg.fill(player?.coloring)
+                pg.stroke(player?.coloring)
+        pg.textAlign(CENTER,BOTTOM);
+        pg.text(`Switch to Weapon:\n${gunData[chosenGun].display}`,0,205);
+        pg.pop();
+    mouseSprite(this.x,this.y,player.coloring,{prog: frameCounts,dir: 1,tween: 10+sin(frameCounts*5)*2.5, tweenVel: 0},3,chosenGun);
+        pg.fill(20);
+        pg.noStroke();
+        pg.ellipse(this.x,this.y,50,50);
+      //  player.gunType=guns[(this.gunStage+guns.length-1)%guns.length];
+        if(this.preGunStage!=this.gunStage){
+          this.bullet = new Bullet(this.x,this.y,0,0,(chosenGun=="nuclex")? "nuclex1" : chosenGun,myId,player.coloring,0);
+          this.bullet.canMove = false;
+          for(let i=0; i<20; i++){
+          let angle = random(0,360);
+          particles[particles.length] = new Particle(this.x+cos(angle)*(this.baseRadius+40),this.y+sin(angle)*(this.baseRadius+40),cos(angle)*3,sin(angle)*3,"Shape",myId,player.coloring)
+        }
+        }
+        this.bullet.size = min(90,this.bullet.size);
+        this.bullet.xvel = cos(frameCounts);
+        this.bullet.yvel = sin(frameCounts);
+        this.bullet.coloring = player.coloring;
+        this.bullet.work();
+        this.preGunStage = this.gunStage;
+    }
       if(this.type=="Gun"){
         this.radius+=this.sizeVel;
         this.sizeVel/=1.2;

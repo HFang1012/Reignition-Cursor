@@ -1,3 +1,4 @@
+var banger;
 var gunData = {"common": {zoom: 0.6, reload: 1.55,recoil: 0.5,display: "Common",regen: 2.5,details:"Shoots a single bullet!"},"spike": {zoom: 0.7, reload: 1.9,recoil: 4, display: "Spike",regen: 2.5,details:"Shoots four short spikes!"},"homing": {zoom: 0.5, reload: 1.6,recoil: 2,display: "Navigation",regen: 3,details:"Bullets avoid nearby walls!"},"bounce": {zoom: 0.7, reload: 1.2,recoil: 2,display: "Bounce",regen: 2.5,details:"Bullets bounce off walls!"},"magic": {zoom: 0.6, reload: 1.2, recoil: 0, display: "Magic",regen: 3.5,details:"Bullets moves towards nearby enemies!"},"shock": {zoom: 0.5, reload: 1.1, recoil: 3,display:"Shockwave",regen: 3,details:"Shoots a barrage of bullets!"},"dash": {zoom: 0.7, reload: 1.5, recoil: -4.5,display:"Dash",regen: 2,details:"Boosts the player forwards!"},"nuclex": {zoom: 0.53, reload: 1.35, recoil: 1,display:"Nuclex",regen: 3,details:"Bullets oscillate back and forth!"}, "recall": {zoom: 0.6, reload: 2, recoil: 0.5,display:"Reverb",regen: 1.45,details:"Bullets slowly start backtracking!"}, "snipe": {zoom: 0.4,reload:1.1,recoil:3,display:"Sniper",regen: 4,details:"Fast bullets deal double damage!"}, "phase":{zoom: 0.5,reload: 1.2,recoil: 1.6,display:"Phase",regen: 2.7,details:"Triples bullets through walls!"}};
 //"range": {zoom: 0.75, reload: 1.5,recoil: 2, display: "Ranger",regen: 1.5},"bomb": {zoom: 0.6,reload: 1.7,recoil: 2,display:"Bomb",regen: 3.5,details:"Explodes with bullets on hit!"}
 //"jumper":{zoom: 0.55,reload: 1.1,recoil: 1.8,display:"Jumper",regen: 2.9,details:"Jumps people!"}
@@ -35,7 +36,9 @@ var myIP;
 var enables = {spawn: true};
 function preload(){
  pixelShader = loadShader("pixel.vert", "pixel.frag");
- emptySound = loadSound("empty-1.mp3");
+ emptySound = loadSound("BANGER.mp3");
+//  banger = loadSound("BANGER.mp3");
+ banger = createAudio("BANGER.mp3");
  let url = "https://api.ipify.org?format=json";
  ipData = loadJSON(url);
 }
@@ -61,8 +64,18 @@ function setup(){
  loadSocket();
  setInterval(CustomDraw, 1000/60);
  emptySound.loop();
- emptySound.setVolume(0);
+//  emptySound.setVolume(0);
+//  if (banger.isLoaded()){
+ 
+//  print(banger)
+//  }
+//  banger.setVolume(0);
+// banger.volume(1);
+// banger.play();
  examplePlayer = new Player(0,0,0,0,0,0,0,0,0,0,0,0,0);
+}
+function mousePressed(){
+  
 }
 var changeObjects = [];
 var mouse={x:0,y:0};
@@ -286,7 +299,7 @@ for(let i of Object.keys(players)){
      pg.translate(0,radius);
      pg.stroke(chosen.coloring);
      let size = min(5,(dist(chosen.x,chosen.y,cameras.x,cameras.y)/100*zoom));
-     if(size>0){
+     if(size>0&&item?.gamemode!="spectator"){
        pg.strokeWeight(size*2)
      pg.line(-2*size,size,0,-size);
      pg.line(2*size,size,0,-size);
@@ -915,7 +928,7 @@ function attemptShoot(){
     shake = 15
  }
   if(player.ammo>0&&screen==1&&player.healthImpact<=0.001&&player.gamemode=="spectator"){
-shake+=40;
+shake+=5;
   }
 }
 function mouseReleased(){
