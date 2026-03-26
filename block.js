@@ -7,9 +7,6 @@ class WorldObject{
     this.type = type ?? "Block";
     this.despawning = false;
     this.marked = false;
-    if(this.type=="Station"){
-      this.radius = 100;
-    }
     this.chunkKey = chunkKey;
     this.gunStage = 1;
     this.preGunStage = 0;
@@ -20,13 +17,29 @@ class WorldObject{
     this.player = new Player(this.x,this.y);
     this.player.health = 0;
     this.player.falsePlayer = true;
+    this.collider = true;
+    if(this.type=="Station"){
+      this.collider = false;
+      this.radius = 100;
+    }
+    this.power = "common";
+  }
+  swaper(){
+for(let i=0; i<20; i++){
+          let angle = random(0,360);
+          particles[particles.length] = new Particle(this.x+cos(angle)*(this.baseRadius+40),this.y+sin(angle)*(this.baseRadius+40),cos(angle)*3,sin(angle)*3,"Shape",myId,player.coloring)
+        }
+        let holder = player.gunType;
+        player.gunType = this.power;
+        this.power = player.gunType;
+        print(player.gunType)
   }
     display(){
        if(this.type=="Station"){
         this.radius+=this.sizeVel;
         this.sizeVel/=1.2;
         this.sizeVel+=(this.baseRadius-this.radius)/10;
-        let chosenGun = guns[this.gunStage%guns.length];
+        let chosenGun = this.power;
         
     pg.push();
     pg.translate(this.x,this.y);

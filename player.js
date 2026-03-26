@@ -96,7 +96,7 @@ class Player{
    }else{
    for(let block of blocks){
      let distance = dist(block.x,block.y,this.x,this.y);
-     if(distance<=this.radius+block.radius){
+     if(distance<=this.radius+block.radius&&block.collider){
        let vect = createVector(this.x-block.x,this.y-block.y);
        vect.normalize();
        vect.mult(this.radius+block.radius);

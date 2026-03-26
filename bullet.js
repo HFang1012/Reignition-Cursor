@@ -185,6 +185,10 @@ if(this.canMove){
       let distance = dist(block.x,block.y,this.x,this.y);
       //HANSON MY CHANGES DONT WORK
       if(distance<=this.size/2+block.radius){
+        if(block.type=="Station"){
+          block.sizeVel-=10;
+          block.swaper();
+        }
         if(this.type!="bounce"&&this.type!="jumper"||this.bounces<=0&&this.type!="jumper"){
           if (this.type == "phase"&&this.alive&&this.playerId==myId){
             this.alive= false;

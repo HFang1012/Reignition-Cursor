@@ -40,13 +40,19 @@ function loadChunk(x,y){
              canPlace = false;
            }
          }
-         if(noiseValue>0.72&&canPlace&&dist(640, 360,x+i,y+c)>safeRadius+noiseSize){
-           addedBlocks[addedBlocks.length] = new WorldObject(x+i,y+c,noiseSize,(random(0,100)<92) ? "Block" : "Station",chunkKey)
+         if(noiseValue>0.72&&canPlace&&(dist(640, 360,x+i,y+c)>safeRadius+noiseSize||gamemode=="royale")){
+           addedBlocks[addedBlocks.length] = new WorldObject(x+i,y+c,noiseSize,(noiseValue<0.78) ? "Block" : "Station",chunkKey)
+           try{
+           addedBlocks[addedBlocks.length-1].power = guns[min(max(floor((1000*(noiseValue-0.78))/64*guns.length),0),guns.length-1)];
+           }catch{
+           
+           }
          }
        }
      }
      for(let block of addedBlocks){
        blocks[blocks.length] =new WorldObject(block.x,block.y,block.radius,block.type,block.chunkKey)
+       blocks[blocks.length-1].power = block.power;
      }
      chunkData[chunkKey] = {blocks: addedBlocks};
    }

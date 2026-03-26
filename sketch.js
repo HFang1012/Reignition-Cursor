@@ -20,6 +20,7 @@ var helpMsgs = {"How to Play": `WASD or Arrow Keys To Move\nClick or Space to Sh
 //"Combat Tips": `Use the Arrow to Track Positions\nPredict Where Enemies are Moving\nUse Walls To Your Advantage\nUse Recoil For Movement\nSave Ammo, Drain Theirs\nMove In All Directions\nShoot Multiple Shots At Once`,
 var helpMsg = helpMsgs["How to Play"];
 var selectedItem = {...faces};
+var playingMusic = false;
 /*
 Version:
  Prototyping Shooting and Socket
@@ -36,7 +37,7 @@ var myIP;
 var enables = {spawn: true};
 function preload(){
  pixelShader = loadShader("pixel.vert", "pixel.frag");
- emptySound = loadSound("empty-1.mp3");
+ emptySound = loadSound("BANGER.mp3");
 //  banger = loadSound("BANGER.mp3");
  //banger = createAudio("BANGER.mp3");
  let url = "https://api.ipify.org?format=json";
@@ -63,7 +64,7 @@ function setup(){
  player=new Player(640, 360);
  loadSocket();
  setInterval(CustomDraw, 1000/60);
- emptySound.loop();
+ 
 //  emptySound.setVolume(0);
 //  if (banger.isLoaded()){
  
@@ -73,9 +74,6 @@ function setup(){
 // banger.volume(1);
 // banger.play();
  examplePlayer = new Player(0,0,0,0,0,0,0,0,0,0,0,0,0);
-}
-function mousePressed(){
-  
 }
 var changeObjects = [];
 var mouse={x:0,y:0};
@@ -644,7 +642,7 @@ function keyPressed(){
         //Commands: /help, /copy, /ammo [AMOUNT], /newgun <TYPE>, /newface <TYPE>, /newcolor <NUMBER>, /players, /tp <PLAYER>, /teleport <PLAYER>
     
      chatMessages[chatMessages.length] = {msg: "Stat's Shown, Type \"/stats\" to toggle!", timer: 120, id: myId, entityName: "Server"};
-       showDetails=!showDetails;
+       showDetails=!showDetails;s
      }
      //showDetails
      else if(currentMessage=="/copy"){
@@ -959,6 +957,10 @@ function randomId() {
 
 //x,y,xvel,yvel,type,id,coloring
 function mousePressed(){
+  if(!playingMusic){
+    playingMusic=true
+  emptySound.loop();
+  }
  mouseProg.tweenVel-=10;
  mouseProg.dir*=-4;
  mouseProg.dir=constrain(mouseProg.dir,-11,11);
