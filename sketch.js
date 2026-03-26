@@ -36,9 +36,9 @@ var myIP;
 var enables = {spawn: true};
 function preload(){
  pixelShader = loadShader("pixel.vert", "pixel.frag");
- emptySound = loadSound("BANGER.mp3");
+ emptySound = loadSound("empty-1.mp3");
 //  banger = loadSound("BANGER.mp3");
- banger = createAudio("BANGER.mp3");
+ //banger = createAudio("BANGER.mp3");
  let url = "https://api.ipify.org?format=json";
  ipData = loadJSON(url);
 }

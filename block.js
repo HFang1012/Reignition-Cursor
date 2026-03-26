@@ -7,6 +7,9 @@ class WorldObject{
     this.type = type ?? "Block";
     this.despawning = false;
     this.marked = false;
+    if(this.type=="Station"){
+      this.radius = 100;
+    }
     this.chunkKey = chunkKey;
     this.gunStage = 1;
     this.preGunStage = 0;
@@ -48,7 +51,7 @@ class WorldObject{
         pg.fill(player?.coloring)
                 pg.stroke(player?.coloring)
         pg.textAlign(CENTER,BOTTOM);
-        pg.text(`Switch to Weapon:\n${gunData[chosenGun].display}`,0,205);
+        //pg.text(`Switch to Weapon:\n${gunData[chosenGun].display}`,0,205);
         pg.pop();
     mouseSprite(this.x,this.y,player.coloring,{prog: frameCounts,dir: 1,tween: 10+sin(frameCounts*5)*2.5, tweenVel: 0},3,chosenGun);
         pg.fill(20);
